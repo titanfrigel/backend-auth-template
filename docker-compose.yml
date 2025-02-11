@@ -1,0 +1,46 @@
+services:
+  authtemplate:
+    image: ${DOCKER_REGISTRY-}authtemplate
+    build:
+      context: .
+      dockerfile: AuthTemplate/Dockerfile
+    networks:
+        - backend-network
+        - api-network
+    depends_on:
+      app-db:
+        condition: service_healthy
+    environment:
+        - ASPNETCORE_ENVIRONMENT=Development
+        - ConnectionStrings__AppDb=Host=app-db;Port=5432;Database=AppDb;Username=postgres;Password=Rjv7GTCfFSiVaIs2OOKx69NUju2v2wlM
+        - Jwt__SigningKey=Xkg0YDF7UXsnZE9cdk9le3w0MmU1QTp5PEhlQHFGLEw=
+        - Jwt__ValidIssuer=authtemplate
+        - Jwt__ValidAudience=authtemplate
+        - Jwt__ExpiresInMinutes=15
+
+  app-db:
+    image: postgres:17
+    restart: always
+    user: postgres
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=AppDb
+      - POSTGRES_PASSWORD=Rjv7GTCfFSiVaIs2OOKx69NUju2v2wlM
+    networks:
+        - backend-network
+    expose:
+        - "5432"
+    healthcheck:
+      test: ["CMD", "pg_isready"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  db-data:
+
+networks:
+  backend-network:
+    driver: bridge
+  api-network:
