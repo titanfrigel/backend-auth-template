@@ -28,7 +28,23 @@ namespace AuthTemplate
 
                 if (result.Succeeded)
                 {
+                    _ = await userManager.AddToRoleAsync(adminUser, "User");
                     _ = await userManager.AddToRoleAsync(adminUser, "Admin");
+                }
+            }
+
+            string normalEmail = "user@example.com";
+            AppUser? normalUser = await userManager.FindByEmailAsync(normalEmail);
+
+            if (normalUser == null)
+            {
+                normalUser = new AppUser { UserName = normalEmail, Email = normalEmail };
+
+                IdentityResult result = await userManager.CreateAsync(normalUser, "UserPass123!");
+
+                if (result.Succeeded)
+                {
+                    _ = await userManager.AddToRoleAsync(normalUser, "User");
                 }
             }
         }

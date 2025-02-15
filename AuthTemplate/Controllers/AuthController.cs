@@ -23,9 +23,15 @@ namespace AuthTemplate.Controllers
             SigningCredentials credentials = new(key, SecurityAlgorithms.HmacSha256);
 
             List<Claim> claims = [
-                new Claim(ClaimTypes.Email, user.Email!),
-                new Claim(ClaimTypes.Role, userManager.GetRolesAsync(user).Result.FirstOrDefault() ?? "User")
+                new Claim("sub", user.Id),
+                new Claim("email", user.Email!),
             ];
+
+            IList<string> roles = userManager.GetRolesAsync(user).Result;
+            foreach (string role in roles)
+            {
+                claims.Add(new Claim("role", role));
+            }
 
             JwtSecurityToken token = new(
                 issuer: configuration["Jwt:ValidIssuer"],
@@ -42,6 +48,17 @@ namespace AuthTemplate.Controllers
         private string GenerateRefreshToken()
         {
             return Convert.ToBase64String(RandomNumberGenerator.GetBytes(64));
+        }
+
+        private void SetTokenCookies(string refreshToken)
+        {
+            Response.Cookies.Append("refreshToken", refreshToken, new CookieOptions
+            {
+                HttpOnly = true,
+                SameSite = SameSiteMode.None,
+                Secure = true,
+                Expires = DateTime.Now.AddDays(configuration.GetValue<int>("Jwt:RefreshExpiresInDays"))
+            });
         }
 
         [HttpPost("register")]
@@ -83,15 +100,22 @@ namespace AuthTemplate.Controllers
 
             _ = await userManager.UpdateAsync(user);
 
-            return Ok(new AuthTokenReadDto { AccessToken = token, RefreshToken = refreshToken });
+            SetTokenCookies(refreshToken);
+
+            return Ok(new AuthTokenReadDto { AccessToken = token });
         }
 
         [HttpPost("refresh")]
-        public async Task<IActionResult> Refresh([FromBody] AuthRefreshTokenDto refreshTokenDto)
+        public async Task<IActionResult> Refresh()
         {
-            AppUser? user = await userManager.Users.FirstOrDefaultAsync(u => u.RefreshToken == refreshTokenDto.RefreshToken);
+            if (!Request.Cookies.TryGetValue("refreshToken", out string? refreshToken) || refreshToken == null)
+            {
+                return Unauthorized();
+            }
 
-            if (user == null || user.RefreshToken != refreshTokenDto.RefreshToken || user.RefreshTokenExpiryTime <= DateTime.UtcNow)
+            AppUser? user = await userManager.Users.FirstOrDefaultAsync(u => u.RefreshToken == refreshToken);
+
+            if (user == null || user.RefreshToken != refreshToken || user.RefreshTokenExpiryTime <= DateTime.UtcNow)
             {
                 return Unauthorized();
             }
@@ -102,7 +126,9 @@ namespace AuthTemplate.Controllers
             user.RefreshToken = newRefreshToken;
             _ = await userManager.UpdateAsync(user);
 
-            return Ok(new AuthTokenReadDto { AccessToken = newToken, RefreshToken = newRefreshToken });
+            SetTokenCookies(newRefreshToken);
+
+            return Ok(new AuthTokenReadDto { AccessToken = newToken });
         }
     }
 }

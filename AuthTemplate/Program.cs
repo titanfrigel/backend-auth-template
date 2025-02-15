@@ -41,7 +41,7 @@ builder.Services.AddSwaggerGen(c =>
         Type = SecuritySchemeType.Http,
         Scheme = "Bearer",
         BearerFormat = "JWT",
-        Description = "Enter Your token in the text input below.\nExample: 'abc123xyz'"
+        Description = "Enter your token in the text input below.\nExample: 'abc123xyz'"
     });
 
     c.AddSecurityRequirement(new OpenApiSecurityRequirement

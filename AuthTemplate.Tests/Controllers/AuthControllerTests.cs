@@ -1,10 +1,11 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using AuthTemplate.Dtos;
+using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net;
 using System.Net.Http.Json;
 using System.Text;
-using AuthTemplate.Dtos;
 
 namespace AuthTemplate.Tests.Controllers
 {
@@ -18,7 +19,11 @@ namespace AuthTemplate.Tests.Controllers
         public Task InitializeAsync()
         {
             _factory = new NoAuthWebApplicationFactory<Program>(_databaseName);
-            _client = _factory.CreateClient();
+            _client = _factory.CreateClient(new WebApplicationFactoryClientOptions
+            {
+                AllowAutoRedirect = false,
+                HandleCookies = true
+            });
             _configuration = _factory.Configuration;
 
             return Task.CompletedTask;
@@ -80,18 +85,33 @@ namespace AuthTemplate.Tests.Controllers
 
             AuthTokenReadDto? tokenResponse = await response.Content.ReadFromJsonAsync<AuthTokenReadDto>();
             Assert.NotNull(tokenResponse);
-            Assert.NotNull(tokenResponse.RefreshToken);
 
-            HttpResponseMessage response2 = await _client.PostAsJsonAsync("/auth/refresh", new AuthRefreshTokenDto { RefreshToken = tokenResponse.RefreshToken });
+            IEnumerable<string> cookies = response.Headers.GetValues("Set-Cookie");
+            string? refreshToken = null;
+
+            foreach (string cookie in cookies)
+            {
+                if (cookie.StartsWith("refreshToken="))
+                {
+                    refreshToken = cookie.Split(";")[0].Split("=")[1];
+                }
+            }
+
+            Assert.NotNull(refreshToken);
+
+            HttpRequestMessage refreshRequest = new(HttpMethod.Post, "/auth/refresh");
+            refreshRequest.Headers.Add("Cookie", $"refreshToken={refreshToken}");
+
+            HttpResponseMessage response2 = await _client.SendAsync(refreshRequest);
 
             _ = response2.EnsureSuccessStatusCode();
             Assert.Equal(HttpStatusCode.OK, response2.StatusCode);
 
             AuthTokenReadDto? tokenResponse2 = await response2.Content.ReadFromJsonAsync<AuthTokenReadDto>();
-            Assert.NotNull(tokenResponse);
-            Assert.NotEmpty(tokenResponse.AccessToken);
+            Assert.NotNull(tokenResponse2);
+            Assert.NotEmpty(tokenResponse2.AccessToken);
 
-            ValidateJwtToken(tokenResponse.AccessToken);
+            ValidateJwtToken(tokenResponse2.AccessToken);
         }
 
         [Fact]

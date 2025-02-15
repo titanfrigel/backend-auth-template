@@ -17,6 +17,7 @@ services:
         - Jwt__ValidIssuer=authtemplate
         - Jwt__ValidAudience=authtemplate
         - Jwt__ExpiresInMinutes=15
+        - Jwt__RefreshExpiresInDays=30
 
   app-db:
     image: postgres:17
