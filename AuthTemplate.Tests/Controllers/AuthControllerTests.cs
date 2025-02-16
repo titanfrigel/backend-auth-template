@@ -117,7 +117,7 @@ namespace AuthTemplate.Tests.Controllers
         [Fact]
         public async Task Register_WithHttpRoute_ReturnsSuccess()
         {
-            HttpResponseMessage response = await _client.PostAsJsonAsync("/auth/register", new AuthLoginDto { Email = "user@example.com", Password = "UserPass123!" });
+            HttpResponseMessage response = await _client.PostAsJsonAsync("/auth/register", new AuthRegisterDto { Email = "userTest@example.com", Password = "UserTestPass123!" });
 
             _ = response.EnsureSuccessStatusCode();
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -127,13 +127,13 @@ namespace AuthTemplate.Tests.Controllers
         [Fact]
         public async Task RegisterThenLogin_WithHttpRoute_ReturnsValidJwtToken()
         {
-            HttpResponseMessage response = await _client.PostAsJsonAsync("/auth/register", new AuthLoginDto { Email = "user@example.com", Password = "UserPass123!" });
+            HttpResponseMessage response = await _client.PostAsJsonAsync("/auth/register", new AuthRegisterDto { Email = "userTest@example.com", Password = "UserTestPass123!" });
 
             _ = response.EnsureSuccessStatusCode();
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             Assert.Equal("User registered successfully", await response.Content.ReadAsStringAsync());
 
-            HttpResponseMessage response2 = await _client.PostAsJsonAsync("/auth/login", new AuthLoginDto { Email = "user@example.com", Password = "UserPass123!" });
+            HttpResponseMessage response2 = await _client.PostAsJsonAsync("/auth/login", new AuthLoginDto { Email = "userTest@example.com", Password = "UserTestPass123!" });
 
             _ = response2.EnsureSuccessStatusCode();
             Assert.Equal(HttpStatusCode.OK, response2.StatusCode);

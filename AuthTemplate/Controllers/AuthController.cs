@@ -50,20 +50,25 @@ namespace AuthTemplate.Controllers
             return Convert.ToBase64String(RandomNumberGenerator.GetBytes(64));
         }
 
-        private void SetTokenCookies(string refreshToken)
+        private void SetTokenCookies(string refreshToken, DateTime refreshTokenExpiryDate)
         {
             Response.Cookies.Append("refreshToken", refreshToken, new CookieOptions
             {
                 HttpOnly = true,
                 SameSite = SameSiteMode.None,
                 Secure = true,
-                Expires = DateTime.UtcNow.AddDays(configuration.GetValue<int>("Jwt:RefreshExpiresInDays"))
+                Expires = refreshTokenExpiryDate
             });
         }
 
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] AuthRegisterDto registerDto)
         {
+            if (userManager.FindByEmailAsync(registerDto.Email).Result != null)
+            {
+                return BadRequest("Email already in use");
+            }
+
             AppUser user = new()
             {
                 UserName = registerDto.Email,
@@ -95,12 +100,16 @@ namespace AuthTemplate.Controllers
             string token = GenerateJwtToken(user);
             string refreshToken = GenerateRefreshToken();
 
+            int refreshExpiresInDays = loginDto.RememberMe
+               ? configuration.GetValue<int>("Jwt:RememberMeRefreshExpiresInDays")
+               : configuration.GetValue<int>("Jwt:DefaultRefreshExpiresInDays");
+
             user.RefreshToken = refreshToken;
-            user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(configuration.GetValue<int>("Jwt:RefreshExpiresInDays"));
+            user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(refreshExpiresInDays);
 
             _ = await userManager.UpdateAsync(user);
 
-            SetTokenCookies(refreshToken);
+            SetTokenCookies(refreshToken, user.RefreshTokenExpiryTime!.Value);
 
             return Ok(new AuthTokenReadDto { AccessToken = token });
         }
@@ -126,7 +135,7 @@ namespace AuthTemplate.Controllers
             user.RefreshToken = newRefreshToken;
             _ = await userManager.UpdateAsync(user);
 
-            SetTokenCookies(newRefreshToken);
+            SetTokenCookies(newRefreshToken, user.RefreshTokenExpiryTime!.Value);
 
             return Ok(new AuthTokenReadDto { AccessToken = newToken });
         }
