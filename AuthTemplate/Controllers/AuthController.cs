@@ -38,7 +38,7 @@ namespace AuthTemplate.Controllers
                 audience: configuration["Jwt:ValidAudience"],
                 claims: claims,
                 notBefore: DateTime.UtcNow,
-                expires: DateTime.Now.AddMinutes(configuration.GetValue<int>("Jwt:ExpiresInMinutes")),
+                expires: DateTime.UtcNow.AddMinutes(configuration.GetValue<int>("Jwt:ExpiresInMinutes")),
                 signingCredentials: credentials
             );
 
@@ -57,7 +57,7 @@ namespace AuthTemplate.Controllers
                 HttpOnly = true,
                 SameSite = SameSiteMode.None,
                 Secure = true,
-                Expires = DateTime.Now.AddDays(configuration.GetValue<int>("Jwt:RefreshExpiresInDays"))
+                Expires = DateTime.UtcNow.AddDays(configuration.GetValue<int>("Jwt:RefreshExpiresInDays"))
             });
         }
 
@@ -96,7 +96,7 @@ namespace AuthTemplate.Controllers
             string refreshToken = GenerateRefreshToken();
 
             user.RefreshToken = refreshToken;
-            user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7);
+            user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(configuration.GetValue<int>("Jwt:RefreshExpiresInDays"));
 
             _ = await userManager.UpdateAsync(user);
 
