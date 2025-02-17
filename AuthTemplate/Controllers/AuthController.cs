@@ -231,7 +231,7 @@ namespace AuthTemplate.Controllers
         [HttpPost("reset-password")]
         public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDto resetPasswordDto)
         {
-            AppUser? user = await userManager.FindByEmailAsync(resetPasswordDto.Email);
+            AppUser? user = await userManager.FindByIdAsync(resetPasswordDto.UserId);
             if (user == null)
             {
                 return BadRequest("User not found.");
