@@ -45,7 +45,7 @@ namespace AuthTemplate.Controllers
 
         private string GetEmailConfirmationLink(AppUser user, string token)
         {
-            return $"{configuration["FrontendUri"]}/verify-email?userId={user.Id}&token={Uri.EscapeDataString(token)}";
+            return $"{configuration["FrontendUri"]}/confirm-email?userId={user.Id}&token={Uri.EscapeDataString(token)}";
         }
 
         private string GetResetPasswordLink(AppUser user, string token)
