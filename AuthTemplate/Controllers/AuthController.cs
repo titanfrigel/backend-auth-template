@@ -18,6 +18,7 @@ namespace AuthTemplate.Controllers
     [AllowAnonymous]
     public class AuthController(IConfiguration configuration, UserManager<AppUser> userManager, IEmailSender emailSender) : ControllerBase
     {
+        #region HELLPER FUNCTIONS
         private string GetEmailConfirmationHtml(string confirmationLink)
         {
             return $@"
@@ -96,6 +97,8 @@ namespace AuthTemplate.Controllers
             });
         }
 
+        #endregion
+
         #region REGISTER
 
         [HttpPost("register")]
@@ -135,7 +138,7 @@ namespace AuthTemplate.Controllers
             return Ok("User registered. Check your email to confirm your account.");
         }
 
-        [HttpGet("confirm-email")]
+        [HttpPost("confirm-email")]
         public async Task<IActionResult> ConfirmEmail([FromBody] ConfirmEmailDto confirmEmailDto)
         {
             AppUser? user = await userManager.FindByIdAsync(confirmEmailDto.UserId);
