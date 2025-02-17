@@ -33,6 +33,12 @@ namespace AuthTemplate
                 }
             }
 
+            if (!adminUser.EmailConfirmed)
+            {
+                string token = await userManager.GenerateEmailConfirmationTokenAsync(adminUser);
+                _ = await userManager.ConfirmEmailAsync(adminUser, token);
+            }
+
             string normalEmail = "user@example.com";
             AppUser? normalUser = await userManager.FindByEmailAsync(normalEmail);
 
@@ -46,6 +52,12 @@ namespace AuthTemplate
                 {
                     _ = await userManager.AddToRoleAsync(normalUser, "User");
                 }
+            }
+
+            if (!normalUser.EmailConfirmed)
+            {
+                string token = await userManager.GenerateEmailConfirmationTokenAsync(normalUser);
+                _ = await userManager.ConfirmEmailAsync(normalUser, token);
             }
         }
 

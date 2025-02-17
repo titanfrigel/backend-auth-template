@@ -5,10 +5,10 @@ using AuthTemplate.Middlewares;
 using AuthTemplate.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using System.Diagnostics;
 using System.Reflection;
 using System.Text;
 
@@ -70,9 +70,18 @@ if (!builder.Environment.IsEnvironment("Testing"))
 }
 
 // Add Identity
-builder.Services.AddIdentity<AppUser, IdentityRole>()
+builder.Services.AddIdentity<AppUser, IdentityRole>(options =>
+    {
+        options.SignIn.RequireConfirmedEmail = true;
+    })
     .AddEntityFrameworkStores<AppDbContext>()
     .AddDefaultTokenProviders();
+
+// Add Email Sender
+builder.Services.AddTransient<IEmailSender, EmailSender>();
+
+// Add Unconfirmed User Cleanup
+builder.Services.AddHostedService<UnconfirmedUserCleanupService>();
 
 // Add Authentication
 builder.Services.AddAuthorization();

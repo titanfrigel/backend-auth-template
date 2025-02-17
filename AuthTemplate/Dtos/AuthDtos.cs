@@ -6,6 +6,29 @@
         public string Password { get; set; } = null!;
     }
 
+    public class ResendVerificationDto
+    {
+        public string Email { get; set; } = null!;
+    }
+
+    public class ConfirmEmailDto
+    {
+        public string UserId { get; set; } = null!;
+        public string Token { get; set; } = null!;
+    }
+
+    public class ForgotPasswordDto
+    {
+        public string Email { get; set; } = null!;
+    }
+
+    public class ResetPasswordDto
+    {
+        public string Email { get; set; } = null!;
+        public string Token { get; set; } = null!;
+        public string NewPassword { get; set; } = null!;
+    }
+
     public class AuthLoginDto
     {
         public string Email { get; set; } = null!;

@@ -19,6 +19,10 @@ services:
         - Jwt__ExpiresInMinutes=15
         - Jwt__DefaultRefreshExpiresInDays=1
         - Jwt__RememberMeRefreshExpiresInDays=30
+        - FrontendUri="https://example.com",
+        - EmailVerificationDelayInMinutes=1,
+        - ResetPasswordDelayInMinutes=5,
+        - UnconfirmedUserCleanupTimeInDays=7
 
   app-db:
     image: postgres:17
