@@ -174,7 +174,7 @@ namespace AuthTemplate.Controllers
 
             DateTime now = DateTime.UtcNow;
             if (user.LastVerificationEmailSent.HasValue &&
-                (now - user.LastVerificationEmailSent.Value).TotalSeconds < configuration.GetValue<int>("EmailVerificationDelayInMinutes"))
+                (now - user.LastVerificationEmailSent.Value).TotalMinutes < configuration.GetValue<int>("EmailVerificationDelayInMinutes"))
             {
                 return BadRequest("Please wait before requesting another verification email.");
             }
