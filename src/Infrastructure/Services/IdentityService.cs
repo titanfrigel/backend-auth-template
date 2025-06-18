@@ -19,6 +19,7 @@ using BackendAuthTemplate.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using BackendAuthTemplate.Application.Common.Utils;
 
 namespace BackendAuthTemplate.Infrastructure.Services
 {
@@ -39,7 +40,7 @@ namespace BackendAuthTemplate.Infrastructure.Services
         private readonly GeneralSettings generalSettings = generalOptions.Value;
         private readonly AuthSettings jwtSettings = jwtOptions.Value;
 
-        #region HELLPER FUNCTIONS
+        #region HELPER FUNCTIONS
         private Task SendConfirmEmailAsync(IAppUser user, string token, CancellationToken cancellationToken = default)
         {
             string confirmLink = $"{generalSettings.FrontendUri}/confirm-email?userId={user.Id}&token={Uri.EscapeDataString(token)}";
@@ -54,33 +55,6 @@ namespace BackendAuthTemplate.Infrastructure.Services
             return emailService.SendResetPasswordEmailAsync(user, resetLink, cancellationToken);
         }
 
-        public static string CapitalizeProperName(string name)
-        {
-            if (string.IsNullOrWhiteSpace(name))
-            {
-                return name;
-            }
-
-            string[] words = name.Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries);
-
-            IEnumerable<string> result = words.Select(word =>
-            {
-                string[] parts = word.Split(['-', '\''], StringSplitOptions.None);
-                List<char> separators = word.Where(c => c is '-' or '\'').ToList();
-
-                List<string> formatted = parts.Select(p => char.ToUpper(p[0]) + p[1..].ToLower()).ToList();
-
-                string reassembled = formatted[0];
-                for (int i = 1; i < formatted.Count; i++)
-                {
-                    reassembled += separators[i - 1] + formatted[i];
-                }
-
-                return reassembled;
-            });
-
-            return string.Join(" ", result);
-        }
         #endregion
 
         public async Task<Result> RegisterAsync(RegisterCommand command, CancellationToken cancellationToken = default)
@@ -95,8 +69,8 @@ namespace BackendAuthTemplate.Infrastructure.Services
             {
                 UserName = command.Email,
                 Email = command.Email,
-                FirstName = CapitalizeProperName(command.FirstName),
-                LastName = CapitalizeProperName(command.LastName),
+                FirstName = command.FirstName.CapitalizeProperName(),
+                LastName = command.LastName.CapitalizeProperName(),
                 PhoneNumber = command.PhoneNumber,
                 Address = command.Address,
                 City = command.City,
@@ -371,8 +345,8 @@ namespace BackendAuthTemplate.Infrastructure.Services
                 return UsersErrors.NotFound(userContext.UserId);
             }
 
-            user.FirstName = CapitalizeProperName(command.FirstName);
-            user.LastName = CapitalizeProperName(command.LastName);
+            user.FirstName = command.FirstName.CapitalizeProperName();
+            user.LastName = command.LastName.CapitalizeProperName();
             user.PhoneNumber = command.PhoneNumber;
             user.Address = command.Address;
             user.City = command.City;
