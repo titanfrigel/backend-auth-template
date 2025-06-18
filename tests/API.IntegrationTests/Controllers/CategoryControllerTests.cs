@@ -1,7 +1,10 @@
 ﻿using BackendAuthTemplate.API.Requests.Categories;
 using BackendAuthTemplate.Application.Common.PaginatedList;
 using BackendAuthTemplate.Application.Features.Categories.Dtos;
+using BackendAuthTemplate.Domain.Entities;
+using BackendAuthTemplate.Infrastructure.Data;
 using BackendAuthTemplate.Tests.Common.Categories;
+using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
 using System.Net;
 using System.Net.Http.Json;
@@ -74,6 +77,24 @@ namespace BackendAuthTemplate.API.IntegrationTests.Controllers
             _ = categories.ShouldNotBeNull();
             categories.Items.First().Subcategories.ShouldNotBeEmpty();
             categories.Items.First().Subcategories!.First().Category.ShouldBeNull();
+        }
+
+        [Fact]
+        public async Task GetCategoryById_Should_Return_Category()
+        {
+            using IServiceScope scope = _factory.ServiceProvider.CreateScope();
+            AppDbContext context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+
+            Category category = context.Categories.First();
+
+            HttpResponseMessage response = await _client.GetAsync($"/api/v1/categories/{category.Id}");
+
+            _ = response.EnsureSuccessStatusCode();
+
+            ReadCategoryDto? readCategory = await response.Content.ReadFromJsonAsync<ReadCategoryDto>();
+
+            _ = readCategory.ShouldNotBeNull();
+            readCategory.Id.ShouldBe(category.Id);
         }
     }
 }
