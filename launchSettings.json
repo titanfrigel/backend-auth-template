@@ -4,10 +4,10 @@
       "commandName": "DockerCompose",
       "commandVersion": "1.0",
       "composeLaunchAction": "LaunchBrowser",
-      "composeLaunchServiceName": "authtemplate",
-      "composeLaunchUrl": "{Scheme}://localhost:{ServicePort}/api/v1/swagger",
+      "composeLaunchServiceName": "backendauthtemplate",
+      "composeLaunchUrl": "{Scheme}://localhost:{ServicePort}/api/swagger",
       "serviceActions": {
-        "authtemplate": "StartDebugging",
+        "backendauthtemplate": "StartDebugging",
         "app-db": "StartWithoutDebugging"
       }
     }
