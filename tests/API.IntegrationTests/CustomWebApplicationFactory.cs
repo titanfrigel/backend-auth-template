@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -36,8 +37,9 @@ namespace BackendAuthTemplate.API.IntegrationTests
 
             _ = builder.ConfigureTestServices(services =>
             {
-                _ = services.AddDbContext<AppDbContext>(options =>
+                _ = services.AddDbContext<AppDbContext>((sp, options) =>
                 {
+                    _ = options.AddInterceptors(sp.GetServices<ISaveChangesInterceptor>());
                     _ = options.UseSqlite($"DataSource=file:memdb{_dbName}?mode=memory&cache=shared");
                 });
 
@@ -54,11 +56,22 @@ namespace BackendAuthTemplate.API.IntegrationTests
             });
         }
 
+        public async Task<Func<IDisposable>> GetScopedUserContextAs(string email)
+        {
+            using IServiceScope scope = _serviceProvider!.CreateScope();
+
+            IUser userContext = scope.ServiceProvider.GetRequiredService<IUser>();
+            UserManager<AppUser> userManager = scope.ServiceProvider.GetRequiredService<UserManager<AppUser>>();
+
+            AppUser? user = await userManager.FindByEmailAsync(email) ?? throw new Exception("User not found in the test database.");
+
+            return () => userContext.BeginScope(user.Id);
+        }
+
         public async Task<string> GenerateJwtTokenAsync(string email)
         {
             using IServiceScope scope = _serviceProvider!.CreateScope();
 
-            AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
             UserManager<AppUser> userManager = scope.ServiceProvider.GetRequiredService<UserManager<AppUser>>();
             ITokenService tokenService = scope.ServiceProvider.GetRequiredService<ITokenService>();
 

@@ -1,4 +1,5 @@
-﻿using System.Net.Http.Headers;
+﻿using Microsoft.Extensions.DependencyInjection;
+using System.Net.Http.Headers;
 
 namespace BackendAuthTemplate.API.IntegrationTests
 {
@@ -23,6 +24,11 @@ namespace BackendAuthTemplate.API.IntegrationTests
             _factory.Dispose();
 
             return Task.CompletedTask;
+        }
+
+        protected async Task<Func<IDisposable>> GetSeedingScopeAsAdmin()
+        {
+            return await _factory.GetScopedUserContextAs("admin@example.com");
         }
 
         protected void ClearJwtToken()
