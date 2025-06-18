@@ -1,9 +1,9 @@
 services:
-  authtemplate:
-    image: ${DOCKER_REGISTRY-}authtemplate
+  backendauthtemplate:
+    image: ${DOCKER_REGISTRY-}backendauthtemplate
     build:
       context: .
-      dockerfile: AuthTemplate/Dockerfile
+      dockerfile: src/API/Dockerfile
     networks:
         - backend-network
         - api-network
@@ -13,16 +13,32 @@ services:
     environment:
         - ASPNETCORE_ENVIRONMENT=Development
         - ConnectionStrings__AppDb=Host=app-db;Port=5432;Database=AppDb;Username=postgres;Password=Rjv7GTCfFSiVaIs2OOKx69NUju2v2wlM
-        - Jwt__SigningKey=Xkg0YDF7UXsnZE9cdk9le3w0MmU1QTp5PEhlQHFGLEw=
-        - Jwt__ValidIssuer=authtemplate
-        - Jwt__ValidAudience=authtemplate
-        - Jwt__ExpiresInMinutes=15
-        - Jwt__DefaultRefreshExpiresInDays=1
-        - Jwt__RememberMeRefreshExpiresInDays=30
-        - FrontendUri="https://example.com",
-        - EmailVerificationDelayInMinutes=1,
-        - ResetPasswordDelayInMinutes=5,
-        - UnconfirmedUserCleanupTimeInDays=7
+
+        - Auth__DefaultRefreshExpiresInDays=1
+        - Auth__ExpiresInMinutes=15
+        - Auth__RememberMeRefreshExpiresInDays=30
+        - Auth__SigningKey=Xkg0YDF7UXsnZE9cdk9le3w0MmU1QTp5PEhlQHFGLEw=
+        - Auth__ValidAudience=backendauthtemplate
+        - Auth__ValidIssuer=backendauthtemplate
+        - Emails__SendToEmail=arthur.thomas@arkeios.com
+        - Emails__SendToName=Arthur Thomas
+        - General__FrontendUri=https://example.com
+        - Logging__LogLevel__Default=Information
+        - Logging__LogLevel__Microsoft.AspNetCore=Warning
+        - Security__EmailVerificationDelayInMinutes=1
+        - Security__ResetPasswordDelayInMinutes=5
+        - Security__UnconfirmedUserCleanupIntervalInDays=1
+        - Security__UnconfirmedUserCleanupTimeInDays=7
+        - Smtp__NoreplyFrom__Email=email@example.com
+        - Smtp__NoreplyFrom__Name=Email
+        - Smtp__NoreplyFrom__Password=EmailPass
+        - Smtp__NoreplyFrom__Username=EmailUser
+        - Smtp__NotifyFrom__Email=email@example.com
+        - Smtp__NotifyFrom__Name=Email
+        - Smtp__NotifyFrom__Password=EmailPass
+        - Smtp__NotifyFrom__Username=EmailUser
+        - Smtp__Port=1111
+        - Smtp__Server=smtp.example.com
 
   app-db:
     image: postgres:17

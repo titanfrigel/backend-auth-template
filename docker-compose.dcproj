@@ -7,7 +7,7 @@
     <ProjectGuid>15e737e8-3340-463f-90ab-e72090fad0dc</ProjectGuid>
     <DockerLaunchAction>LaunchBrowser</DockerLaunchAction>
     <DockerServiceUrl>{Scheme}://localhost:{ServicePort}/swagger</DockerServiceUrl>
-    <DockerServiceName>authtemplate</DockerServiceName>
+    <DockerServiceName>backendauthtemplate</DockerServiceName>
   </PropertyGroup>
   <ItemGroup>
     <None Include="docker-compose.override.yml">

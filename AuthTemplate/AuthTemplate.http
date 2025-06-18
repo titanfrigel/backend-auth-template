@@ -1,6 +1,0 @@
-@AuthTemplate_HostAddress = http://localhost:5202
-
-GET {{AuthTemplate_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###
