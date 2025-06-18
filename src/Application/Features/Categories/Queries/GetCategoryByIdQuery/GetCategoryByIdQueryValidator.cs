@@ -8,6 +8,8 @@ namespace BackendAuthTemplate.Application.Features.Categories.Queries.GetCategor
         public GetCategoryByIdQueryValidator()
         {
             _ = RuleFor(x => x.CategoryId).NotEmpty().WithErrorCode(ValidationCodes.Required);
+
+            _ = RuleFor(x => x.Include).NotNull().WithErrorCode(ValidationCodes.Required);
         }
     }
 }

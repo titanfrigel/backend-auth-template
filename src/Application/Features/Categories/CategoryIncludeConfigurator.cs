@@ -11,6 +11,16 @@ namespace BackendAuthTemplate.Application.Features.Categories
             "subcategories"
         ];
 
+        public override Dictionary<string, HashSet<string>> RoleExtras => new()
+        {
+            {
+                "Admin",
+                [
+                    "createdBy"
+                ]
+            }
+        };
+
         public override IQueryable<Category> ApplyIncludes(IQueryable<Category> query, IncludeTree includes)
         {
             if (includes.ContainsKey("subcategories"))

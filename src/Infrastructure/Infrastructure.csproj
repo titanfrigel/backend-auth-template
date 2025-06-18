@@ -24,4 +24,8 @@
     <ProjectReference Include="..\EmailComponents\EmailComponents.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Data\Migrations\" />
+  </ItemGroup>
+
 </Project>

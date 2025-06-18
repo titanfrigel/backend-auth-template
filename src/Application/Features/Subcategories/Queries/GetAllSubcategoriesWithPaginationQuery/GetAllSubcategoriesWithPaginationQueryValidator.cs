@@ -8,6 +8,14 @@ namespace BackendAuthTemplate.Application.Features.Subcategories.Queries.GetAllS
         public GetAllSubcategoriesWithPaginationQueryValidator()
         {
             _ = RuleFor(x => x).NotNull().WithErrorCode(ValidationCodes.Required);
+
+            _ = RuleFor(x => x.Include).NotNull().WithErrorCode(ValidationCodes.Required);
+
+            _ = RuleFor(x => x.PageNumber).GreaterThan(0).WithErrorCode(ValidationCodes.TooSmall);
+
+            _ = RuleFor(x => x.PageSize)
+                .GreaterThan(0).WithErrorCode(ValidationCodes.TooSmall)
+                .LessThanOrEqualTo(100).WithErrorCode(ValidationCodes.TooLarge);
         }
     }
 }

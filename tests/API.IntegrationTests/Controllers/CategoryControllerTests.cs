@@ -35,9 +35,32 @@ namespace BackendAuthTemplate.API.IntegrationTests.Controllers
             PaginatedList<ReadCategoryDto>? categories = await response.Content.ReadFromJsonAsync<PaginatedList<ReadCategoryDto>>();
 
             _ = categories.ShouldNotBeNull();
+            categories.Items.ShouldAllBe(x => x.CreatedBy == null);
         }
 
+        [Fact]
+        public async Task GetAllCategories_IncludeCreatedBy_Should_FailForUsers()
+        {
 
+            HttpResponseMessage response = await _client.GetAsync("/api/v1/categories?include=createdBy");
+
+            response.IsSuccessStatusCode.ShouldBeFalse();
+        }
+
+        [Fact]
+        public async Task GetAllCategories_IncludeCreatedBy_Should_SucceedForAdmins()
+        {
+            await SetAdminJwtToken();
+
+            HttpResponseMessage response = await _client.GetAsync("/api/v1/categories?include=createdBy");
+
+            _ = response.EnsureSuccessStatusCode();
+
+            PaginatedList<ReadCategoryDto>? categories = await response.Content.ReadFromJsonAsync<PaginatedList<ReadCategoryDto>>();
+
+            _ = categories.ShouldNotBeNull();
+            categories.Items.ShouldAllBe(x => x.CreatedBy != null);
+        }
 
         [Fact]
         public async Task GetAllCategories_Include_Subcategories_ShouldReturnListOfCategories()
