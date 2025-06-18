@@ -111,18 +111,18 @@ namespace BackendAuthTemplate.Infrastructure.Services
             AppUser? user = await userManager.FindByIdAsync(command.UserId.ToString());
             if (user == null)
             {
-                return UsersErrors.Failure();
+                return UsersErrors.NotFound(command.UserId);
             }
 
             if (user.EmailConfirmed)
             {
-                return UsersErrors.Failure();
+                return UsersErrors.AlreadyConfirmed();
             }
 
             IdentityResult result = await userManager.ConfirmEmailAsync(user, command.Token);
             if (!result.Succeeded)
             {
-                return UsersErrors.Failure();
+                return UsersErrors.InvalidToken();
             }
 
             return Result.Success();
@@ -146,7 +146,7 @@ namespace BackendAuthTemplate.Infrastructure.Services
             if (user.LastVerificationEmailSent.HasValue &&
                 (utcNow - user.LastVerificationEmailSent.Value).TotalMinutes < securitySettings.EmailVerificationDelayInMinutes)
             {
-                return UsersErrors.Failure();
+                return UsersErrors.EmailResendTooSoon();
             }
 
             string token = await userManager.GenerateEmailConfirmationTokenAsync(user);
@@ -177,7 +177,7 @@ namespace BackendAuthTemplate.Infrastructure.Services
             if (user.LastPasswordResetEmailSent.HasValue
                 && (utcNow - user.LastPasswordResetEmailSent.Value).TotalMinutes < securitySettings.ResetPasswordDelayInMinutes)
             {
-                return UsersErrors.Failure();
+                return UsersErrors.PasswordResetTooSoon();
             }
 
             string token = await userManager.GeneratePasswordResetTokenAsync(user);
@@ -200,13 +200,13 @@ namespace BackendAuthTemplate.Infrastructure.Services
             AppUser? user = await userManager.FindByIdAsync(command.UserId.ToString());
             if (user == null)
             {
-                return UsersErrors.Failure();
+                return UsersErrors.NotFound(command.UserId);
             }
 
             IdentityResult resetPasswordResult = await userManager.ResetPasswordAsync(user, command.Token, command.NewPassword);
             if (!resetPasswordResult.Succeeded)
             {
-                return UsersErrors.Failure();
+                return UsersErrors.InvalidToken();
             }
 
             user.RefreshTokenHash = null;
@@ -226,12 +226,12 @@ namespace BackendAuthTemplate.Infrastructure.Services
             AppUser? user = await userManager.FindByEmailAsync(command.Email);
             if (user == null || !await userManager.CheckPasswordAsync(user, command.Password))
             {
-                return UsersErrors.Failure();
+                return UsersErrors.InvalidCredentials();
             }
 
             if (!await userManager.IsEmailConfirmedAsync(user))
             {
-                return UsersErrors.Failure();
+                return UsersErrors.EmailNotConfirmed();
             }
 
             IList<string> roles = await userManager.GetRolesAsync(user);
@@ -286,20 +286,20 @@ namespace BackendAuthTemplate.Infrastructure.Services
 
             if (refreshTokenComposite == null)
             {
-                return UsersErrors.Failure();
+                return UsersErrors.InvalidToken();
             }
 
             string[] split = refreshTokenComposite.Split('.', 2);
 
             if (!Guid.TryParse(split[0], out Guid userId))
             {
-                return UsersErrors.Failure();
+                return UsersErrors.InvalidToken();
             }
 
             AppUser? user = await userManager.Users.FirstOrDefaultAsync(u => u.Id == userId, cancellationToken);
             if (user == null)
             {
-                return UsersErrors.Failure();
+                return UsersErrors.InvalidToken();
             }
 
             if (user.RefreshTokenExpiryTime == null ||
@@ -308,12 +308,12 @@ namespace BackendAuthTemplate.Infrastructure.Services
                 !tokenService.Verify(split[1], user.RefreshTokenHash)
             )
             {
-                return UsersErrors.Failure();
+                return UsersErrors.InvalidToken();
             }
 
             if (!await userManager.IsEmailConfirmedAsync(user))
             {
-                return UsersErrors.Failure();
+                return UsersErrors.EmailNotConfirmed();
             }
 
             IList<string> roles = await userManager.GetRolesAsync(user);

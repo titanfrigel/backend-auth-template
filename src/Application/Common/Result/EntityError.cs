@@ -4,7 +4,7 @@
     {
         protected abstract string Entity { get; }
 
-        private static readonly T Instance = new();
+        protected static readonly T Instance = new();
 
         public static Error Failure()
         {
