@@ -2,9 +2,9 @@
 {
     public interface IUser
     {
-        public Guid UserId { get; }
-        public IEnumerable<string> Roles { get; }
-        public bool HasContext { get; }
-        public IDisposable BeginScope(Guid userId);
+        Guid UserId { get; }
+        IEnumerable<string> Roles { get; }
+        bool HasContext { get; }
+        IDisposable BeginScope(Guid userId);
     }
 }

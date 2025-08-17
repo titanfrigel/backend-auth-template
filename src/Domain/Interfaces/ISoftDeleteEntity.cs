@@ -2,8 +2,8 @@
 {
     public interface ISoftDeleteEntity : IEntity
     {
-        public bool IsDeleted { get; set; }
-        public DateTimeOffset? DeletedAt { get; set; }
-        public Guid? DeletedById { get; set; }
+        bool IsDeleted { get; set; }
+        DateTimeOffset? DeletedAt { get; set; }
+        Guid? DeletedById { get; set; }
     }
 }

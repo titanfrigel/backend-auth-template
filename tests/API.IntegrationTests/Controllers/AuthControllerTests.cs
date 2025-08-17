@@ -35,6 +35,7 @@ namespace BackendAuthTemplate.API.IntegrationTests.Controllers
 
             _ = tokenDto.ShouldNotBeNull();
             tokenDto.AccessToken.ShouldNotBeNullOrEmpty();
+            tokenDto.RefreshToken.ShouldNotBeNullOrEmpty();
         }
     }
 }

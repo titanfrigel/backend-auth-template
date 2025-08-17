@@ -29,6 +29,7 @@ services:
         - Security__ResetPasswordDelayInMinutes=5
         - Security__UnconfirmedUserCleanupIntervalInDays=1
         - Security__UnconfirmedUserCleanupTimeInDays=7
+        - Security__RefreshReuseLeewaySeconds=5
         - Smtp__NoreplyFrom__Email=email@example.com
         - Smtp__NoreplyFrom__Name=Email
         - Smtp__NoreplyFrom__Password=EmailPass

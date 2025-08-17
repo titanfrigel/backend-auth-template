@@ -6,5 +6,6 @@
         public required int ResetPasswordDelayInMinutes { get; init; }
         public required int UnconfirmedUserCleanupTimeInDays { get; init; }
         public required int UnconfirmedUserCleanupIntervalInDays { get; init; }
+        public required int RefreshReuseLeewaySeconds { get; init; }
     }
 }

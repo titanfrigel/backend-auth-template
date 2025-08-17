@@ -6,5 +6,6 @@ namespace BackendAuthTemplate.Application.Features.Auth.Commands.RefreshTokenCom
 {
     public class RefreshTokenCommand : IRequest<Result<ReadTokenDto>>
     {
+        public string? RefreshToken { get; set; }
     }
 }

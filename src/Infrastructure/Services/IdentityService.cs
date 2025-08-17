@@ -2,6 +2,7 @@
 using BackendAuthTemplate.Application.Common.Interfaces;
 using BackendAuthTemplate.Application.Common.Result;
 using BackendAuthTemplate.Application.Common.Settings;
+using BackendAuthTemplate.Application.Common.Utils;
 using BackendAuthTemplate.Application.Features.Auth.Commands.ConfirmEmailCommand;
 using BackendAuthTemplate.Application.Features.Auth.Commands.ForgotPasswordCommand;
 using BackendAuthTemplate.Application.Features.Auth.Commands.LoginCommand;
@@ -14,12 +15,10 @@ using BackendAuthTemplate.Application.Features.Auth.Dtos;
 using BackendAuthTemplate.Application.Features.Users;
 using BackendAuthTemplate.Application.Features.Users.Commands.UpdateUserMeCommand;
 using BackendAuthTemplate.Application.Features.Users.Dtos;
-using BackendAuthTemplate.Domain.Interfaces;
 using BackendAuthTemplate.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using BackendAuthTemplate.Application.Common.Utils;
 
 namespace BackendAuthTemplate.Infrastructure.Services
 {
@@ -41,14 +40,14 @@ namespace BackendAuthTemplate.Infrastructure.Services
         private readonly AuthSettings jwtSettings = jwtOptions.Value;
 
         #region HELPER FUNCTIONS
-        private Task SendConfirmEmailAsync(IAppUser user, string token, CancellationToken cancellationToken = default)
+        private Task SendConfirmEmailAsync(AppUser user, string token, CancellationToken cancellationToken = default)
         {
             string confirmLink = $"{generalSettings.FrontendUri}/confirm-email?userId={user.Id}&token={Uri.EscapeDataString(token)}";
 
             return emailService.SendConfirmEmailAsync(user, confirmLink, cancellationToken);
         }
 
-        private Task SendResetPasswordEmailAsync(IAppUser user, string token, CancellationToken cancellationToken = default)
+        private Task SendResetPasswordEmailAsync(AppUser user, string token, CancellationToken cancellationToken = default)
         {
             string resetLink = $"{generalSettings.FrontendUri}/reset-password?userId={user.Id}&token={Uri.EscapeDataString(token)}";
 
@@ -237,6 +236,7 @@ namespace BackendAuthTemplate.Infrastructure.Services
             IList<string> roles = await userManager.GetRolesAsync(user);
             string token = tokenService.GenerateAccessToken(user.Id, user.Email!, user.FirstName, user.LastName, roles);
             string refreshToken = tokenService.GenerateRefreshToken();
+            string refreshTokenComposite = tokenService.GenerateRefreshTokenComposite(user.Id, refreshToken);
 
             int refreshExpiresInDays = command.RememberMe
                ? jwtSettings.RememberMeRefreshExpiresInDays
@@ -244,6 +244,8 @@ namespace BackendAuthTemplate.Infrastructure.Services
 
             user.RefreshTokenHash = tokenService.Hash(refreshToken);
             user.RefreshTokenExpiryTime = timeProvider.GetUtcNow().AddDays(refreshExpiresInDays);
+            user.PreviousRefreshTokenHash = null;
+            user.PreviousRefreshTokenValidUntil = null;
 
             IdentityResult result = await userManager.UpdateAsync(user);
             if (!result.Succeeded)
@@ -251,11 +253,12 @@ namespace BackendAuthTemplate.Infrastructure.Services
                 return UsersErrors.Failure();
             }
 
-            cookieService.SetRefreshToken(tokenService.GenerateRefreshTokenComposite(user.Id, refreshToken), user.RefreshTokenExpiryTime!.Value);
+            cookieService.SetRefreshToken(refreshTokenComposite, user.RefreshTokenExpiryTime!.Value);
 
             return new ReadTokenDto()
             {
-                AccessToken = token
+                AccessToken = token,
+                RefreshToken = refreshTokenComposite
             };
         }
 
@@ -282,7 +285,7 @@ namespace BackendAuthTemplate.Infrastructure.Services
 
         public async Task<Result<ReadTokenDto>> RefreshTokenAsync(RefreshTokenCommand command, CancellationToken cancellationToken = default)
         {
-            string? refreshTokenComposite = cookieService.GetRefreshToken();
+            string? refreshTokenComposite = command?.RefreshToken ?? cookieService.GetRefreshToken();
 
             if (refreshTokenComposite == null)
             {
@@ -302,11 +305,21 @@ namespace BackendAuthTemplate.Infrastructure.Services
                 return UsersErrors.InvalidToken();
             }
 
-            if (user.RefreshTokenExpiryTime == null ||
-                user.RefreshTokenExpiryTime < DateTimeOffset.UtcNow ||
-                user.RefreshTokenHash == null ||
-                !tokenService.Verify(split[1], user.RefreshTokenHash)
-            )
+            DateTimeOffset now = timeProvider.GetUtcNow();
+
+            bool matchesCurrent =
+                user.RefreshTokenHash != null
+                && user.RefreshTokenExpiryTime != null
+                && user.RefreshTokenExpiryTime >= now
+                && tokenService.Verify(split[1], user.RefreshTokenHash);
+
+            bool matchesPrevious =
+                user.PreviousRefreshTokenHash != null
+                && user.PreviousRefreshTokenValidUntil != null
+                && now <= user.PreviousRefreshTokenValidUntil
+                && tokenService.Verify(split[1], user.PreviousRefreshTokenHash);
+
+            if (!matchesCurrent && !matchesPrevious)
             {
                 return UsersErrors.InvalidToken();
             }
@@ -318,17 +331,31 @@ namespace BackendAuthTemplate.Infrastructure.Services
 
             IList<string> roles = await userManager.GetRolesAsync(user);
             string newToken = tokenService.GenerateAccessToken(user.Id, user.Email!, user.FirstName, user.LastName, roles);
-            string newRefreshToken = tokenService.GenerateRefreshToken();
 
-            user.RefreshTokenHash = tokenService.Hash(newRefreshToken);
-
-            IdentityResult result = await userManager.UpdateAsync(user);
-            if (!result.Succeeded)
+            if (matchesCurrent)
             {
-                return UsersErrors.Failure();
-            }
+                string newRefreshToken = tokenService.GenerateRefreshToken();
+                string newRefreshTokenComposite = tokenService.GenerateRefreshTokenComposite(user.Id, newRefreshToken);
 
-            cookieService.SetRefreshToken(tokenService.GenerateRefreshTokenComposite(user.Id, newRefreshToken), user.RefreshTokenExpiryTime!.Value);
+                user.PreviousRefreshTokenHash = user.RefreshTokenHash;
+                user.PreviousRefreshTokenValidUntil = now.AddSeconds(securitySettings.RefreshReuseLeewaySeconds);
+
+                user.RefreshTokenHash = tokenService.Hash(newRefreshToken);
+
+                IdentityResult result = await userManager.UpdateAsync(user);
+                if (!result.Succeeded)
+                {
+                    return UsersErrors.Failure();
+                }
+
+                cookieService.SetRefreshToken(newRefreshTokenComposite, user.RefreshTokenExpiryTime!.Value);
+
+                return new ReadTokenDto()
+                {
+                    AccessToken = newToken,
+                    RefreshToken = newRefreshTokenComposite
+                };
+            }
 
             return new ReadTokenDto()
             {

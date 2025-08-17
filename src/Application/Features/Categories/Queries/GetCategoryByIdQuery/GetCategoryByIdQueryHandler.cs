@@ -1,11 +1,8 @@
 ﻿using AutoMapper;
-using AutoMapper.QueryableExtensions;
 using BackendAuthTemplate.Application.Common.Include;
 using BackendAuthTemplate.Application.Common.Interfaces;
 using BackendAuthTemplate.Application.Common.Result;
 using BackendAuthTemplate.Application.Features.Categories.Dtos;
-using BackendAuthTemplate.Application.Features.Subcategories.Dtos;
-using BackendAuthTemplate.Application.Features.Subcategories;
 using BackendAuthTemplate.Application.Features.Users.Dtos;
 using BackendAuthTemplate.Domain.Entities;
 using MediatR;

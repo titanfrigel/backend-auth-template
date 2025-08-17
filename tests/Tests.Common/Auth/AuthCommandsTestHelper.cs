@@ -53,10 +53,11 @@ namespace BackendAuthTemplate.Tests.Common.Auth
             };
         }
 
-        public static RefreshTokenCommand RefreshTokenCommand()
+        public static RefreshTokenCommand RefreshTokenCommand(string? refreshToken = null)
         {
             return new()
             {
+                RefreshToken = refreshToken
             };
         }
 

@@ -18,6 +18,7 @@ namespace BackendAuthTemplate.Application.FunctionalTests.Auth.Commands
             result.Succeeded.ShouldBeTrue();
             _ = result.Value.ShouldNotBeNull();
             result.Value.AccessToken.ShouldNotBeNullOrEmpty();
+            result.Value.RefreshToken.ShouldNotBeNullOrEmpty();
         }
     }
 }

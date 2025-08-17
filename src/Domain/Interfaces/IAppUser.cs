@@ -2,19 +2,21 @@
 {
     public interface IAppUser
     {
-        public Guid Id { get; set; }
-        public string? Email { get; set; }
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
-        public string? PhoneNumber { get; set; }
-        public string Address { get; set; }
-        public string City { get; set; }
-        public string ZipCode { get; set; }
-        public string CountryCode { get; set; }
-        public string? RefreshTokenHash { get; set; }
-        public DateTimeOffset? RefreshTokenExpiryTime { get; set; }
-        public DateTimeOffset? LastVerificationEmailSent { get; set; }
-        public DateTimeOffset? LastPasswordResetEmailSent { get; set; }
-        public DateTimeOffset CreatedAt { get; set; }
+        Guid Id { get; set; }
+        string? Email { get; set; }
+        string FirstName { get; set; }
+        string LastName { get; set; }
+        string? PhoneNumber { get; set; }
+        string Address { get; set; }
+        string City { get; set; }
+        string ZipCode { get; set; }
+        string CountryCode { get; set; }
+        string? RefreshTokenHash { get; set; }
+        DateTimeOffset? RefreshTokenExpiryTime { get; set; }
+        string? PreviousRefreshTokenHash { get; set; }
+        DateTimeOffset? PreviousRefreshTokenValidUntil { get; set; }
+        DateTimeOffset? LastVerificationEmailSent { get; set; }
+        DateTimeOffset? LastPasswordResetEmailSent { get; set; }
+        DateTimeOffset CreatedAt { get; set; }
     }
 }

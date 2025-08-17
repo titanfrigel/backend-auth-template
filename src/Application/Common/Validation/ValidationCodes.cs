@@ -5,9 +5,9 @@
         public const string Required = "required";
         public const string TooShort = "tooShort";
         public const string TooLong = "tooLong";
-        public const string Invalid = "invalidFormat";
+        public const string Invalid = "invalid";
         public const string TooSmall = "tooSmall";
         public const string TooLarge = "tooLarge";
-        public const string AlreadyExist = "alreadyExists";
+        public const string AlreadyExist = "alreadyExist";
     }
 }

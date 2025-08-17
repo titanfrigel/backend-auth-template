@@ -5,13 +5,13 @@ namespace BackendAuthTemplate.Domain.Interfaces
 {
     public interface IEntity
     {
-        public Guid Id { get; set; }
+        Guid Id { get; set; }
 
         [NotMapped]
-        public IReadOnlyCollection<BaseEvent> DomainEvents { get; }
+        IReadOnlyCollection<BaseEvent> DomainEvents { get; }
 
-        public void AddDomainEvent(BaseEvent domainEvent);
-        public void RemoveDomainEvent(BaseEvent domainEvent);
-        public void ClearDomainEvents();
+        void AddDomainEvent(BaseEvent domainEvent);
+        void RemoveDomainEvent(BaseEvent domainEvent);
+        void ClearDomainEvents();
     }
 }

@@ -124,9 +124,9 @@ namespace BackendAuthTemplate.API.Controllers
 
         [HttpPost("refresh")]
         [EnableRateLimiting("auth")]
-        public async Task<ActionResult<ReadTokenDto>> Refresh()
+        public async Task<ActionResult<ReadTokenDto>> Refresh([FromBody] RefreshTokenRequest request)
         {
-            RefreshTokenCommand command = new();
+            RefreshTokenCommand command = mapper.Map<RefreshTokenCommand>(request);
 
             Result<ReadTokenDto> result = await mediator.Send(command);
 

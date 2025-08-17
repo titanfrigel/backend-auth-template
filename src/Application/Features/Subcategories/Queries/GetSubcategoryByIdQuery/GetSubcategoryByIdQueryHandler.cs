@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using AutoMapper.QueryableExtensions;
 using BackendAuthTemplate.Application.Common.Include;
 using BackendAuthTemplate.Application.Common.Interfaces;
 using BackendAuthTemplate.Application.Common.Result;

@@ -1,13 +1,10 @@
 ﻿using BackendAuthTemplate.API.Requests.Subcategories;
-using BackendAuthTemplate.Application.Common.Interfaces;
 using BackendAuthTemplate.Application.Common.PaginatedList;
 using BackendAuthTemplate.Application.Features.Subcategories.Dtos;
 using BackendAuthTemplate.Domain.Entities;
 using BackendAuthTemplate.Infrastructure.Data;
-using BackendAuthTemplate.Infrastructure.Identity;
 using BackendAuthTemplate.Tests.Common.Categories;
 using BackendAuthTemplate.Tests.Common.Subcategories;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
 using System.Net;
