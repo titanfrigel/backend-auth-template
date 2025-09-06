@@ -13,8 +13,8 @@ namespace BackendAuthTemplate.API.Controllers
         private static readonly object CategoriesHubDoc = new
         {
             hubName = "CategoriesHub",
-            negotiateEndpoint = "/v1/hubs/categories/negotiate",
-            websocketUrl = "/v1/hubs/categories",
+            negotiateEndpoint = "/hubs/v1/categories/negotiate",
+            websocketUrl = "/hubs/v1/categories",
             requires = new[]
             {
                 "Query or Header: access_token (JWT for User role)"
@@ -36,8 +36,8 @@ namespace BackendAuthTemplate.API.Controllers
         private static readonly object SubcategoriesHubDoc = new
         {
             hubName = "SubcategoriesHub",
-            negotiateEndpoint = "/v1/hubs/subcategories/negotiate",
-            websocketUrl = "/v1/hubs/subcategories",
+            negotiateEndpoint = "/hubs/v1/subcategories/negotiate",
+            websocketUrl = "/hubs/v1/subcategories",
             requires = new[]
             {
                 "Query or Header: access_token (JWT for User role)"

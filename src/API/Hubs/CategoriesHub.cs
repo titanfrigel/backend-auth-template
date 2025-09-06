@@ -1,6 +1,6 @@
 ﻿using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 
 namespace BackendAuthTemplate.API.Hubs

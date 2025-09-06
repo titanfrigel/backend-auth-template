@@ -27,7 +27,7 @@ namespace BackendAuthTemplate.API.Common.Extensions
                         ? hubType.Name[..^"Hub".Length]
                         : hubType.Name;
 
-                    routeTemplate = $"/v1/hubs/{hubName.ToLower()}";
+                    routeTemplate = $"/hubs/v1/{hubName.ToLower()}";
                 }
 
                 MethodInfo? method = typeof(HubEndpointRouteBuilderExtensions)
