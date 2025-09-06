@@ -1,30 +1,37 @@
-﻿@using BackendAuthTemplate.EmailComponents.Shared
+@using BackendAuthTemplate.EmailComponents.Shared
 @namespace BackendAuthTemplate.EmailComponents
 @inherits ComponentBase
 
-<div style="@Styles.Wrapper">
-    <div style="@Styles.Card">
+<!DOCTYPE html>
+<html lang="fr">
+    <head>
+        <meta charset="UTF-8">
+        <title>Bienvenue @FirstName 👋</title>
+    </head>
+    <body style="@Styles.Wrapper">
+        <div style="@Styles.Card">
 
-        <h1>Bienvenue @FirstName 👋</h1>
-        <p>
-            Merci de vous être inscrit.
-            Veuillez confirmer votre adresse e-mail pour activer votre compte.
-        </p>
+            <h1>Bienvenue @FirstName 👋</h1>
+            <p>
+                Merci de vous être inscrit.
+                Veuillez confirmer votre adresse e-mail pour activer votre compte.
+            </p>
 
-        <a href="@ConfirmUrl"
-           style="@($"{Styles.Button};background:#007BFF;color:#fff")">
-            Confirmer mon e-mail
-        </a>
+            <a href="@ConfirmUrl"
+               style="@($"{Styles.Button};background:#007BFF;color:#fff")">
+                Confirmer mon e-mail
+            </a>
 
-        <NoReplyDisclaimer />
+            <NoReplyDisclaimer />
 
-        <div style="@Styles.Footer">
-            Ce lien est valable pendant @ValidHours heures.<br /><br />
-            Si vous n'avez pas créé de compte, ignorez cet e-mail.
+            <div style="@Styles.Footer">
+                Ce lien est valable pendant @ValidHours heures.<br /><br />
+                Si vous n'avez pas créé de compte, ignorez cet e-mail.
+            </div>
+
         </div>
-
-    </div>
-</div>
+    </body>
+</html>
 
 @code {
     [Parameter, EditorRequired] public string FirstName { get; set; } = default!;
