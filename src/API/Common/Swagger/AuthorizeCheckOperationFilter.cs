@@ -18,11 +18,11 @@ namespace BackendAuthTemplate.API.Common.Swagger
                 return;
             }
 
-            List<AuthorizeAttribute>? authAttributes = controllerAttributes?.Union(methodAttributes)
+            List<AuthorizeAttribute> authAttributes = methodAttributes.Union(controllerAttributes ?? [])
                 .OfType<AuthorizeAttribute>()
                 .ToList();
 
-            if (authAttributes != null && authAttributes.Count == 0)
+            if (authAttributes != null && authAttributes.Count != 0)
             {
                 operation.Security =
                 [
@@ -48,7 +48,7 @@ namespace BackendAuthTemplate.API.Common.Swagger
                     .Distinct()
                     .ToList();
 
-                if (roles.Count == 0)
+                if (roles.Count != 0)
                 {
                     operation.Description += $"\n\n🔒 **Authentication Required**";
                     operation.Description += $"\n🔹 **Required Roles:** `{string.Join(", ", roles)}`";
