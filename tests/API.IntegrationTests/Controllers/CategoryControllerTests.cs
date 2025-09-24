@@ -29,7 +29,7 @@ namespace BackendAuthTemplate.API.IntegrationTests.Controllers
         }
 
         [Fact]
-        public async Task GetAllCategories_Should_Return_List()
+        public async Task GetAllCategoriesWithPagination_Should_Return_PaginatedList()
         {
             HttpResponseMessage response = await _client.GetAsync("/api/v1/categories");
 
@@ -39,6 +39,19 @@ namespace BackendAuthTemplate.API.IntegrationTests.Controllers
 
             _ = categories.ShouldNotBeNull();
             categories.Items.ShouldAllBe(x => x.CreatedBy == null);
+        }
+
+        [Fact]
+        public async Task GetAllCategories_Should_Return_List()
+        {
+            HttpResponseMessage response = await _client.GetAsync("/api/v1/categories");
+
+            _ = response.EnsureSuccessStatusCode();
+
+            List<ReadCategoryDto>? categories = await response.Content.ReadFromJsonAsync<List<ReadCategoryDto>>();
+
+            _ = categories.ShouldNotBeNull();
+            categories.ShouldAllBe(x => x.CreatedBy == null);
         }
 
         [Fact]
@@ -59,10 +72,10 @@ namespace BackendAuthTemplate.API.IntegrationTests.Controllers
 
             _ = response.EnsureSuccessStatusCode();
 
-            PaginatedList<ReadCategoryDto>? categories = await response.Content.ReadFromJsonAsync<PaginatedList<ReadCategoryDto>>();
+            List<ReadCategoryDto>? categories = await response.Content.ReadFromJsonAsync<List<ReadCategoryDto>>();
 
             _ = categories.ShouldNotBeNull();
-            categories.Items.ShouldAllBe(x => x.CreatedBy != null);
+            categories.ShouldAllBe(x => x.CreatedBy != null);
         }
 
         [Fact]
@@ -72,11 +85,11 @@ namespace BackendAuthTemplate.API.IntegrationTests.Controllers
 
             _ = response.EnsureSuccessStatusCode();
 
-            PaginatedList<ReadCategoryDto>? categories = await response.Content.ReadFromJsonAsync<PaginatedList<ReadCategoryDto>>();
+            List<ReadCategoryDto>? categories = await response.Content.ReadFromJsonAsync<List<ReadCategoryDto>>();
 
             _ = categories.ShouldNotBeNull();
-            categories.Items.First().Subcategories.ShouldNotBeEmpty();
-            categories.Items.First().Subcategories!.First().Category.ShouldBeNull();
+            categories.First().Subcategories.ShouldNotBeEmpty();
+            categories.First().Subcategories!.First().Category.ShouldBeNull();
         }
 
         [Fact]

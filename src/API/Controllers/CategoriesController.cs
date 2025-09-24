@@ -9,6 +9,7 @@ using BackendAuthTemplate.Application.Features.Categories.Commands.CreateCategor
 using BackendAuthTemplate.Application.Features.Categories.Commands.DeleteCategoryCommand;
 using BackendAuthTemplate.Application.Features.Categories.Commands.UpdateCategoryCommand;
 using BackendAuthTemplate.Application.Features.Categories.Dtos;
+using BackendAuthTemplate.Application.Features.Categories.Queries.GetAllCategoriesQuery;
 using BackendAuthTemplate.Application.Features.Categories.Queries.GetAllCategoriesWithPaginationQuery;
 using BackendAuthTemplate.Application.Features.Categories.Queries.GetCategoryByIdQuery;
 using BackendAuthTemplate.Domain.Entities;
@@ -67,7 +68,25 @@ namespace BackendAuthTemplate.API.Controllers
         [HttpGet]
         [AllowAnonymous]
         [IncludeParameter(typeof(Category))]
-        public async Task<ActionResult<PaginatedList<ReadCategoryDto>>> GetAllCategories([FromQuery] List<string> include, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
+        public async Task<ActionResult<List<ReadCategoryDto>>> GetAllCategories([FromQuery] List<string> include)
+        {
+            GetAllCategoriesQuery query = new()
+            {
+                Include = include
+            };
+
+            Result<List<ReadCategoryDto>> result = await mediator.Send(query);
+
+            return result.Match(
+                onSuccess: Ok,
+                onFailure: Problem
+            );
+        }
+
+        [HttpGet("paginated")]
+        [AllowAnonymous]
+        [IncludeParameter(typeof(Category))]
+        public async Task<ActionResult<PaginatedList<ReadCategoryDto>>> GetAllCategoriesPaginated([FromQuery] List<string> include, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {
             GetAllCategoriesWithPaginationQuery query = new()
             {

@@ -10,7 +10,7 @@ namespace BackendAuthTemplate.Application.FunctionalTests.Subcategories.Queries
     public class GetAllSubcategoriesWithPaginationQueryFunctionalTests : ApplicationTestBase
     {
         [Fact]
-        public async Task GetAllSubcategoriesQuery_ShouldReturnList()
+        public async Task GetAllSubcategoriesWithPaginationQuery_ShouldReturnPaginatedList()
         {
             GetAllSubcategoriesWithPaginationQuery query = SubcategoriesQueriesTestHelper.GetAllSubcategoriesWithPaginationQuery();
 

@@ -7,10 +7,10 @@ using Shouldly;
 
 namespace BackendAuthTemplate.Application.FunctionalTests.Categories.Queries
 {
-    public class GetAllCategoriesQueryWithPaginationFunctionalTests : ApplicationTestBase
+    public class GetAllCategoriesWithPaginationQueryFunctionalTests : ApplicationTestBase
     {
         [Fact]
-        public async Task GetAllCategoriesQuery_ShouldReturnListOfCategories()
+        public async Task GetAllCategoriesWithPaginationQuery_ShouldReturnPaginatedListOfCategories()
         {
             GetAllCategoriesWithPaginationQuery query = CategoriesQueriesTestHelper.GetAllCategoriesWithPaginationQuery();
 

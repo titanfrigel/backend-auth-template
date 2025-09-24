@@ -1,4 +1,5 @@
-﻿using BackendAuthTemplate.Application.Features.Categories.Queries.GetAllCategoriesWithPaginationQuery;
+﻿using BackendAuthTemplate.Application.Features.Categories.Queries.GetAllCategoriesQuery;
+using BackendAuthTemplate.Application.Features.Categories.Queries.GetAllCategoriesWithPaginationQuery;
 using BackendAuthTemplate.Application.Features.Categories.Queries.GetCategoryByIdQuery;
 
 namespace BackendAuthTemplate.Tests.Common.Categories
@@ -28,6 +29,16 @@ namespace BackendAuthTemplate.Tests.Common.Categories
             {
                 PageNumber = pageNumber,
                 PageSize = pageSize,
+                Include = include ?? []
+            };
+        }
+
+        public static GetAllCategoriesQuery GetAllCategoriesQuery(
+            List<string>? include = null
+        )
+        {
+            return new()
+            {
                 Include = include ?? []
             };
         }

@@ -1,4 +1,4 @@
-﻿using BackendAuthTemplate.Application.Features.Categories.Queries.GetAllCategoriesWithPaginationQuery;
+﻿using BackendAuthTemplate.Application.Features.Categories.Queries.GetAllCategoriesQuery;
 using BackendAuthTemplate.Tests.Common.Categories;
 using FluentValidation.TestHelper;
 
@@ -6,14 +6,14 @@ namespace BackendAuthTemplate.Application.FunctionalTests.Categories.Validators
 {
     public class GetAllCategoriesQueryValidatorFunctionalTests
     {
-        private readonly GetAllCategoriesWithPaginationQueryValidator _validator = new();
+        private readonly GetAllCategoriesQueryValidator _validator = new();
 
         [Fact]
         public void Should_Not_Have_Error_For_Valid_Query()
         {
-            GetAllCategoriesWithPaginationQuery query = CategoriesQueriesTestHelper.GetAllCategoriesWithPaginationQuery();
+            GetAllCategoriesQuery query = CategoriesQueriesTestHelper.GetAllCategoriesQuery();
 
-            TestValidationResult<GetAllCategoriesWithPaginationQuery> result = _validator.TestValidate(query);
+            TestValidationResult<GetAllCategoriesQuery> result = _validator.TestValidate(query);
 
             result.ShouldNotHaveAnyValidationErrors();
         }

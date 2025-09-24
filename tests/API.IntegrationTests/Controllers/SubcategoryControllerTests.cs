@@ -40,13 +40,25 @@ namespace BackendAuthTemplate.API.IntegrationTests.Controllers
         }
 
         [Fact]
+        public async Task GetAllSubcategoriesWithPagination_Should_Return_PaginatedList()
+        {
+            HttpResponseMessage response = await _client.GetAsync("/api/v1/subcategories/paginated");
+
+            _ = response.EnsureSuccessStatusCode();
+
+            PaginatedList<ReadSubcategoryDto>? subcategories = await response.Content.ReadFromJsonAsync<PaginatedList<ReadSubcategoryDto>>();
+
+            _ = subcategories.ShouldNotBeNull();
+        }
+
+        [Fact]
         public async Task GetAllSubcategories_Should_Return_List()
         {
             HttpResponseMessage response = await _client.GetAsync("/api/v1/subcategories");
 
             _ = response.EnsureSuccessStatusCode();
 
-            PaginatedList<ReadSubcategoryDto>? subcategories = await response.Content.ReadFromJsonAsync<PaginatedList<ReadSubcategoryDto>>();
+            List<ReadSubcategoryDto>? subcategories = await response.Content.ReadFromJsonAsync<List<ReadSubcategoryDto>>();
 
             _ = subcategories.ShouldNotBeNull();
         }

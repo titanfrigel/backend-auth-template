@@ -1,4 +1,4 @@
-﻿using BackendAuthTemplate.Application.Features.Subcategories.Queries.GetAllSubcategoriesWithPaginationQuery;
+﻿using BackendAuthTemplate.Application.Features.Subcategories.Queries.GetAllSubcategoriesQuery;
 using BackendAuthTemplate.Tests.Common.Subcategories;
 using FluentValidation.TestHelper;
 
@@ -6,14 +6,14 @@ namespace BackendAuthTemplate.Application.FunctionalTests.Subcategories.Validato
 {
     public class GetAllSubcategoriesQueryValidatorFunctionalTests
     {
-        private readonly GetAllSubcategoriesWithPaginationQueryValidator _validator = new();
+        private readonly GetAllSubcategoriesQueryValidator _validator = new();
 
         [Fact]
         public void Should_Not_Have_Error_For_Valid_Query()
         {
-            GetAllSubcategoriesWithPaginationQuery query = SubcategoriesQueriesTestHelper.GetAllSubcategoriesWithPaginationQuery();
+            GetAllSubcategoriesQuery query = SubcategoriesQueriesTestHelper.GetAllSubcategoriesQuery();
 
-            TestValidationResult<GetAllSubcategoriesWithPaginationQuery> result = _validator.TestValidate(query);
+            TestValidationResult<GetAllSubcategoriesQuery> result = _validator.TestValidate(query);
 
             result.ShouldNotHaveAnyValidationErrors();
         }

@@ -1,4 +1,5 @@
-﻿using BackendAuthTemplate.Application.Features.Subcategories.Queries.GetAllSubcategoriesWithPaginationQuery;
+﻿using BackendAuthTemplate.Application.Features.Subcategories.Queries.GetAllSubcategoriesQuery;
+using BackendAuthTemplate.Application.Features.Subcategories.Queries.GetAllSubcategoriesWithPaginationQuery;
 using BackendAuthTemplate.Application.Features.Subcategories.Queries.GetSubcategoryByIdQuery;
 
 namespace BackendAuthTemplate.Tests.Common.Subcategories
@@ -27,6 +28,16 @@ namespace BackendAuthTemplate.Tests.Common.Subcategories
             {
                 PageNumber = pageNumber,
                 PageSize = pageSize,
+                Include = include ?? []
+            };
+        }
+
+        public static GetAllSubcategoriesQuery GetAllSubcategoriesQuery(
+            List<string>? include = null
+        )
+        {
+            return new()
+            {
                 Include = include ?? []
             };
         }
