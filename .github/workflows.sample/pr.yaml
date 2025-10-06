@@ -1,31 +1,37 @@
-#   Author: Hugo Kirch
 #   Description: This workflow is userd to test a .NET Core application with dotnet test.
-#   Version: 1.0
 #   Needed Secrets: None
 #   Needed Variables: None
 #   Important parameter: Project Name
 
-name: Pull Request Workflow
+name: Pull Request Tests
 
 on:
   pull_request:
     types: [opened, synchronize, reopened]
     branches: [main, dev]
 
+permissions:
+  contents: read
+
+concurrency:
+  group: "test-${{ github.head_ref || github.ref }}"
+  cancel-in-progress: true
+
 jobs:
   test:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        dotnet-version: [8.*]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      - name: Setup dotnet
-        uses: actions/setup-dotnet@v3
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: ${{ matrix.dotnet-version }}
-      - name: Install dependencies
+          dotnet-version: 8.0.x
+          cache: true
+
+      - name: Restore dependencies
         run: dotnet restore BackendAuthTemplate.sln
-      - name: Test with dotnet
-        run: dotnet test BackendAuthTemplate.sln
+
+      - name: Run tests
+        run: dotnet test BackendAuthTemplate.sln --no-build --verbosity normal
