@@ -21,29 +21,15 @@ namespace BackendAuthTemplate.Application.Features.Categories.Queries.GetAllCate
             PaginatedList<Category> categories = await query
                 .ToPaginatedListAsync(request.PageNumber, request.PageSize, cancellationToken);
 
-            List<ReadCategoryDto> dtos = [];
+            bool includeCreatedBy = builder.tree.ContainsKey("createdBy");
 
-            foreach (Category category in categories.Items)
-            {
-                ReadUserDto? createdBy = null;
+            Dictionary<Guid, ReadUserDto>? createdByUsers = includeCreatedBy
+                ? (await identityService.GetUsersByIdsAsync(categories.Items.Select(x => x.CreatedById).ToList(), cancellationToken)).ToDictionary(x => x.Id, x => x)
+                : null;
 
-                if (builder.tree.ContainsKey("createdBy"))
-                {
-                    createdBy = await identityService.GetUserByIdAsync(category.CreatedById, cancellationToken);
-                }
+            PaginatedList<ReadCategoryDto> dtos = mapper.MapPaginated<ReadCategoryDto, Category>(categories, category => opts => opts.Items["CreatedBy"] = createdByUsers?[category.Id]);
 
-                ReadCategoryDto dto = mapper.Map<ReadCategoryDto>(category, opt => opt.Items["CreatedBy"] = createdBy);
-
-                dtos.Add(dto);
-            }
-
-            return new PaginatedList<ReadCategoryDto>()
-            {
-                Items = dtos,
-                PageNumber = categories.PageNumber,
-                TotalPages = categories.TotalPages,
-                TotalCount = categories.TotalCount
-            };
+            return dtos;
         }
     }
 }

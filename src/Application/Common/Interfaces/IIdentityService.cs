@@ -26,5 +26,6 @@ namespace BackendAuthTemplate.Application.Common.Interfaces
         Task<Result.Result> UpdateUserMeAsync(UpdateUserMeCommand command, CancellationToken cancellationToken = default);
         Task<ReadUserDto?> GetUserMeAsync(CancellationToken cancellationToken = default);
         Task<ReadUserDto?> GetUserByIdAsync(Guid userId, CancellationToken cancellationToken = default);
+        Task<List<ReadUserDto>> GetUsersByIdsAsync(List<Guid> userIds, CancellationToken cancellationToken = default);
     }
 }

@@ -417,5 +417,17 @@ namespace BackendAuthTemplate.Infrastructure.Services
 
             return userDto;
         }
+
+        public async Task<List<ReadUserDto>> GetUsersByIdsAsync(List<Guid> userIds, CancellationToken cancellationToken = default)
+        {
+            List<AppUser> users = await userManager.Users
+                .Where(u => userIds.Contains(u.Id))
+                .ToListAsync(cancellationToken);
+
+            List<ReadUserDto> userDtos = mapper.Map<List<ReadUserDto>>(users);
+
+            return userDtos;
+        }
+
     }
 }

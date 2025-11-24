@@ -21,29 +21,15 @@ namespace BackendAuthTemplate.Application.Features.FeatureName.Queries.GetAllFea
             PaginatedList<EntityName> featureName = await query
                 .ToPaginatedListAsync(request.PageNumber, request.PageSize, cancellationToken);
 
-            List<ReadEntityNameDto> dtos = [];
+            bool includeCreatedBy = builder.tree.ContainsKey("createdBy");
 
-            foreach (EntityName entityName in featureName.Items)
-            {
-                ReadUserDto? createdBy = null;
+            Dictionary<Guid, ReadUserDto>? createdByUsers = includeCreatedBy
+                ? (await identityService.GetUsersByIdsAsync(featureName.Items.Select(x => x.CreatedById).ToList(), cancellationToken)).ToDictionary(x => x.Id, x => x)
+                : null;
 
-                if (builder.tree.ContainsKey("createdBy"))
-                {
-                    createdBy = await identityService.GetUserByIdAsync(entityName.CreatedById, cancellationToken);
-                }
+            PaginatedList<ReadEntityNameDto> dtos = mapper.MapPaginated<ReadEntityNameDto, EntityName>(featureName, entityName => opts => opts.Items["CreatedBy"] = createdByUsers?[entityName.CreatedById]);
 
-                ReadEntityNameDto dto = mapper.Map<ReadEntityNameDto>(entityName, opt => opt.Items["CreatedBy"] = createdBy);
-
-                dtos.Add(dto);
-            }
-
-            return new PaginatedList<ReadEntityNameDto>()
-            {
-                Items = dtos,
-                PageNumber = featureName.PageNumber,
-                TotalPages = featureName.TotalPages,
-                TotalCount = featureName.TotalCount
-            };
+            return dtos;
         }
     }
 }

@@ -3,6 +3,7 @@ using BackendAuthTemplate.Application.Common.Include;
 using BackendAuthTemplate.Application.Common.Interfaces;
 using BackendAuthTemplate.Application.Common.PaginatedList;
 using BackendAuthTemplate.Application.Common.Result;
+using BackendAuthTemplate.Application.Features.Categories.Dtos;
 using BackendAuthTemplate.Application.Features.Subcategories.Dtos;
 using BackendAuthTemplate.Application.Features.Users.Dtos;
 using BackendAuthTemplate.Domain.Entities;
@@ -21,29 +22,15 @@ namespace BackendAuthTemplate.Application.Features.Subcategories.Queries.GetAllS
             PaginatedList<Subcategory> subcategories = await query
                 .ToPaginatedListAsync(request.PageNumber, request.PageSize, cancellationToken);
 
-            List<ReadSubcategoryDto> dtos = [];
+            bool includeCreatedBy = builder.tree.ContainsKey("createdBy");
 
-            foreach (Subcategory subcategory in subcategories.Items)
-            {
-                ReadUserDto? createdBy = null;
+            Dictionary<Guid, ReadUserDto>? createdByUsers = includeCreatedBy
+                ? (await identityService.GetUsersByIdsAsync(subcategories.Items.Select(x => x.CreatedById).ToList(), cancellationToken)).ToDictionary(x => x.Id, x => x)
+                : null;
 
-                if (builder.tree.ContainsKey("createdBy"))
-                {
-                    createdBy = await identityService.GetUserByIdAsync(subcategory.CreatedById, cancellationToken);
-                }
+            PaginatedList<ReadSubcategoryDto> dtos = mapper.MapPaginated<ReadSubcategoryDto, Subcategory>(subcategories, subcategory => opts => opts.Items["CreatedBy"] = createdByUsers?[subcategory.Id]);
 
-                ReadSubcategoryDto dto = mapper.Map<ReadSubcategoryDto>(subcategory, opt => opt.Items["CreatedBy"] = createdBy);
-
-                dtos.Add(dto);
-            }
-
-            return new PaginatedList<ReadSubcategoryDto>()
-            {
-                Items = dtos,
-                PageNumber = subcategories.PageNumber,
-                TotalPages = subcategories.TotalPages,
-                TotalCount = subcategories.TotalCount
-            };
+            return dtos;
         }
     }
 }
