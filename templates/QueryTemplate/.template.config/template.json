@@ -1,0 +1,65 @@
+{
+  "$schema": "http://json.schemastore.org/template",
+  "author": "Gaëtan Kling",
+  "classifications": ["Clean Architecture"],
+  "identity": "BackendAuth.QueryTemplate",
+  "name": "CQRS Query Template",
+  "shortName": "cqrs-query",
+  "sourceName": "BackendAuthTemplate",
+  "preferNameDirectory": false,
+  "tags": {
+    "language": "C#",
+    "type": "item"
+  },
+  "symbols": {
+    "QueryName": {
+      "type": "parameter",
+      "datatype": "text",
+      "isRequired": true,
+      "replaces": "QueryName",
+      "fileRename": "QueryName",
+      "displayName": "Query Name",
+      "description": "The name of the query to be created."
+    },
+    "FeatureName": {
+      "type": "parameter",
+      "datatype": "text",
+      "isRequired": true,
+      "replaces": "FeatureName",
+      "fileRename": "FeatureName",
+      "displayName": "Feature Name",
+      "description": "The name of the feature this command belongs to."
+    },
+    "EntityName": {
+      "type": "parameter",
+      "datatype": "text",
+      "isRequired": true,
+      "replaces": "EntityName",
+      "fileRename": "EntityName",
+      "displayName": "Entity Name",
+      "description": "The name of the entity this command uses."
+    },
+
+    "queryName": {
+      "type": "derived",
+      "valueSource": "QueryName",
+      "valueTransform": "firstLowerCase",
+      "replaces": "queryName",
+      "fileRename": "queryName"
+    },
+    "featureName": {
+      "type": "derived",
+      "valueSource": "FeatureName",
+      "valueTransform": "firstLowerCase",
+      "replaces": "featureName",
+      "fileRename": "featureName"
+    },
+    "entityName": {
+      "type": "derived",
+      "valueSource": "EntityName",
+      "valueTransform": "firstLowerCase",
+      "replaces": "entityName",
+      "fileRename": "entityName"
+    }
+  }
+}
