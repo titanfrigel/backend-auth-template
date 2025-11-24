@@ -7,6 +7,10 @@
   "shortName": "backend-auth",
   "sourceName": "BackendAuthTemplate",
   "preferNameDirectory": true,
+  "tags": {
+    "language": "C#",
+    "type": "item"
+  },
   "symbols": {
     "framework": {
       "type": "parameter",
@@ -22,6 +26,7 @@
       "target": "./",
       "exclude": [
         ".template.config/**/*",
+        "templates/**/*",
         "**/*.filelist",
         "**/*.user",
         "**/*.lock.json",

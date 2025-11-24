@@ -31,7 +31,7 @@ namespace BackendAuthTemplate.API.IntegrationTests.Controllers
         [Fact]
         public async Task GetAllCategoriesWithPagination_Should_Return_PaginatedList()
         {
-            HttpResponseMessage response = await _client.GetAsync("/api/v1/categories");
+            HttpResponseMessage response = await _client.GetAsync("/api/v1/categories/paginated");
 
             _ = response.EnsureSuccessStatusCode();
 
