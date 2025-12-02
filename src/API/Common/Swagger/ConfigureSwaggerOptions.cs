@@ -45,7 +45,6 @@ namespace BackendAuthTemplate.API.Common.Swagger
             });
 
             opts.OperationFilter<AuthorizeCheckOperationFilter>();
-            opts.OperationFilter<IncludeParameterFilter>();
         }
     }
 }

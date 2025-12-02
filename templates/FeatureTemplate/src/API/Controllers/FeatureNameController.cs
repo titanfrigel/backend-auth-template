@@ -1,15 +1,16 @@
 using Asp.Versioning;
 using AutoMapper;
+using BackendAuthTemplate.API.Common.Attributes;
 using BackendAuthTemplate.API.Common.Extensions;
 using BackendAuthTemplate.API.Requests.FeatureName;
-using BackendAuthTemplate.Application.Common.Include;
+using BackendAuthTemplate.Application.Common.Sorting;
 using BackendAuthTemplate.Application.Common.PaginatedList;
 using BackendAuthTemplate.Application.Common.Result;
 using BackendAuthTemplate.Application.Features.FeatureName.Commands.CreateEntityNameCommand;
 using BackendAuthTemplate.Application.Features.FeatureName.Commands.DeleteEntityNameCommand;
 using BackendAuthTemplate.Application.Features.FeatureName.Commands.UpdateEntityNameCommand;
 using BackendAuthTemplate.Application.Features.FeatureName.Dtos;
-using BackendAuthTemplate.Application.Features.FeatureName.Queries.GetAllFeatureNameWithPaginationQuery;
+using BackendAuthTemplate.Application.Features.FeatureName.Queries.GetFeatureNameWithPaginationQuery;
 using BackendAuthTemplate.Application.Features.FeatureName.Queries.GetEntityNameByIdQuery;
 using BackendAuthTemplate.Domain.Entities;
 using MediatR;
@@ -47,13 +48,13 @@ namespace BackendAuthTemplate.API.Controllers
 
         [HttpGet("{entityNameId:guid}")]
         [AllowAnonymous]
-        [IncludeParameter(typeof(EntityName))]
-        public async Task<ActionResult<ReadEntityNameDto>> GetEntityNameById([FromRoute] Guid entityNameId, [FromQuery] List<string> include)
+        [ApiEntity(typeof(EntityName))]
+        public async Task<ActionResult<ReadEntityNameDto>> GetEntityNameById([FromRoute] Guid entityNameId, [FromQuery] IList<string>? includes = null)
         {
             GetEntityNameByIdQuery query = new()
             {
                 EntityNameId = entityNameId,
-                Include = include
+                Includes = includes
             };
 
             Result<ReadEntityNameDto> result = await mediator.Send(query);
@@ -66,14 +67,15 @@ namespace BackendAuthTemplate.API.Controllers
 
         [HttpGet]
         [AllowAnonymous]
-        [IncludeParameter(typeof(EntityName))]
-        public async Task<ActionResult<PaginatedList<ReadEntityNameDto>>> GetAllFeatureNamePaginated([FromQuery] List<string> include, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
+        [ApiEntity(typeof(EntityName))]
+        public async Task<ActionResult<PaginatedList<ReadEntityNameDto>>> GetFeatureNamePaginated([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, [FromQuery] IList<string>? includes = null, [FromQuery] IList<Sort>? sorts = null)
         {
-            GetAllFeatureNameWithPaginationQuery query = new()
+            GetFeatureNameWithPaginationQuery query = new()
             {
                 PageNumber = pageNumber,
                 PageSize = pageSize,
-                Include = include
+                Includes = includes,
+                Sorts = sorts
             };
 
             Result<PaginatedList<ReadEntityNameDto>> result = await mediator.Send(query);

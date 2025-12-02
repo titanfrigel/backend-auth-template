@@ -5,9 +5,9 @@ namespace BackendAuthTemplate.Application.Common.PaginatedList
 {
     public static class PaginatedListExtensions
     {
-        public static Task<PaginatedList<TDestination>> ToPaginatedListAsync<TDestination>(this IQueryable<TDestination> queryable, int pageNumber, int pageSize, CancellationToken cancellationToken = default) where TDestination : class
+        public static Task<PaginatedList<TDestination>> ToPaginatedListAsync<TDestination>(this IQueryable<TDestination> queryable, IPaginable paginatable, CancellationToken cancellationToken = default) where TDestination : class
         {
-            return PaginatedList<TDestination>.CreateAsync(queryable.AsNoTracking(), pageNumber, pageSize, cancellationToken);
+            return PaginatedList<TDestination>.CreateAsync(queryable.AsNoTracking(), paginatable.PageNumber, paginatable.PageSize, cancellationToken);
         }
 
         public static PaginatedList<TDestination> MapPaginated<TDestination, TSource>(this IMapper mapper, PaginatedList<TSource> source, Func<TSource, Action<IMappingOperationOptions>>? opts = null)

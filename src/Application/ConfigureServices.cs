@@ -1,5 +1,5 @@
-﻿using BackendAuthTemplate.Application.Common.Behaviors;
-using BackendAuthTemplate.Application.Common.Include;
+using BackendAuthTemplate.Application.Common;
+using BackendAuthTemplate.Application.Common.Behaviors;
 using FluentValidation;
 using MediatR;
 using MediatR.Pipeline;

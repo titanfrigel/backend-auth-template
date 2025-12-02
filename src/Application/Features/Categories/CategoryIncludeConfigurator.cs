@@ -1,34 +1,14 @@
 ﻿using BackendAuthTemplate.Application.Common.Include;
 using BackendAuthTemplate.Domain.Entities;
-using Microsoft.EntityFrameworkCore;
 
-namespace BackendAuthTemplate.Application.Features.Categories
+namespace BackendAuthTemplate.Application.Features.Categories;
+
+public class CategoryIncludeConfigurator : IIncludeConfigurator<Category>
 {
-    public class CategoryIncludeConfigurator : IncludeConfiguratorBase<Category>
+    public IncludableProperties<Category> Configure()
     {
-        public override HashSet<string> DefaultIncludes =>
-        [
-            "subcategories"
-        ];
-
-        public override Dictionary<string, HashSet<string>> RoleExtras => new()
-        {
-            {
-                "Admin",
-                [
-                    "createdBy"
-                ]
-            }
-        };
-
-        public override IQueryable<Category> ApplyIncludes(IQueryable<Category> query, IncludeTree includes)
-        {
-            if (includes.ContainsKey("subcategories"))
-            {
-                query = query.Include(o => o.Subcategories);
-            }
-
-            return query;
-        }
+        return new IncludableProperties<Category>()
+            .Add("Subcategories")
+            .Add("CreatedBy", isManualInclude: true, roles: ["Admin"]);
     }
 }

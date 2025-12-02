@@ -29,7 +29,7 @@ namespace BackendAuthTemplate.API.IntegrationTests.Controllers
         }
 
         [Fact]
-        public async Task GetAllFeatureName_Should_Return_PaginatedList()
+        public async Task GetFeatureName_Should_Return_PaginatedList()
         {
             HttpResponseMessage response = await _client.GetAsync("/api/v1/FeatureName");
 
@@ -38,31 +38,91 @@ namespace BackendAuthTemplate.API.IntegrationTests.Controllers
             PaginatedList<ReadEntityNameDto>? featureName = await response.Content.ReadFromJsonAsync<PaginatedList<ReadEntityNameDto>>();
 
             _ = featureName.ShouldNotBeNull();
+            _ = featureName.Items.ShouldNotBeNull();
             featureName.Items.ShouldAllBe(x => x.CreatedBy == null);
         }
 
 
         [Fact]
-        public async Task GetAllFeatureName_IncludeCreatedBy_Should_FailForUsers()
+        public async Task GetFeatureName_IncludeCreatedBy_Should_FailForUsers()
         {
-            HttpResponseMessage response = await _client.GetAsync("/api/v1/FeatureName?include=createdBy");
-
-            response.IsSuccessStatusCode.ShouldBeFalse();
-        }
-
-        [Fact]
-        public async Task GetAllFeatureName_IncludeCreatedBy_Should_SucceedForAdmins()
-        {
-            await SetAdminJwtToken();
-
-            HttpResponseMessage response = await _client.GetAsync("/api/v1/FeatureName?include=createdBy");
+            HttpResponseMessage response = await _client.GetAsync("/api/v1/FeatureName?includes=createdBy");
 
             _ = response.EnsureSuccessStatusCode();
 
             PaginatedList<ReadEntityNameDto>? featureName = await response.Content.ReadFromJsonAsync<PaginatedList<ReadEntityNameDto>>();
 
             _ = featureName.ShouldNotBeNull();
+            _ = featureName.Items.ShouldNotBeNull();
+            featureName.Items.ShouldAllBe(x => x.CreatedBy == null);
+        }
+
+        [Fact]
+        public async Task GetFeatureName_IncludeCreatedBy_Should_SucceedForAdmins()
+        {
+            await SetAdminJwtToken();
+
+            HttpResponseMessage response = await _client.GetAsync("/api/v1/FeatureName?includes=createdBy");
+
+            _ = response.EnsureSuccessStatusCode();
+
+            PaginatedList<ReadEntityNameDto>? featureName = await response.Content.ReadFromJsonAsync<PaginatedList<ReadEntityNameDto>>();
+
+            _ = featureName.ShouldNotBeNull();
+            _ = featureName.Items.ShouldNotBeNull();
             featureName.Items.ShouldAllBe(x => x.CreatedBy != null);
+        }
+
+        [Fact]
+        public async Task GetFeatureName_SortNameAscending_Should_Return_PaginatedList()
+        {
+            using IServiceScope scope = _factory.ServiceProvider.CreateScope();
+            AppDbContext context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+
+            EntityName entityNameA;
+            EntityName entityNameZ;
+            Func<IDisposable> beginScope = await GetSeedingScopeAsAdmin();
+            using (beginScope())
+            {
+                entityNameA = await FeatureNameEntitiesTestHelper.SeedEntityName(context, entity: FeatureNameEntitiesTestHelper.CreateValidEntityName(name: "AFeatureName"));
+                entityNameZ = await FeatureNameEntitiesTestHelper.SeedEntityName(context, entity: FeatureNameEntitiesTestHelper.CreateValidEntityName(name: "ZFeatureName"));
+            }
+
+            HttpResponseMessage response = await _client.GetAsync("/api/v1/FeatureName?sorts[0].PropertyName=name&sorts[0].Direction=ascending");
+            _ = response.EnsureSuccessStatusCode();
+
+            PaginatedList<ReadEntityNameDto>? featureName = await response.Content.ReadFromJsonAsync<PaginatedList<ReadEntityNameDto>>();
+
+            _ = featureName.ShouldNotBeNull();
+            _ = featureName.Items.ShouldNotBeNull();
+            featureName.Items.First().Id.ShouldBe(entityNameA.Id);
+            featureName.Items.First().Name.ShouldBe(entityNameA.Name);
+        }
+
+        [Fact]
+        public async Task GetFeatureName_SortNameDescending_Should_Return_PaginatedList()
+        {
+            using IServiceScope scope = _factory.ServiceProvider.CreateScope();
+            AppDbContext context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+
+            EntityName entityNameA;
+            EntityName entityNameZ;
+            Func<IDisposable> beginScope = await GetSeedingScopeAsAdmin();
+            using (beginScope())
+            {
+                entityNameA = await FeatureNameEntitiesTestHelper.SeedEntityName(context, entity: FeatureNameEntitiesTestHelper.CreateValidEntityName(name: "AFeatureName"));
+                entityNameZ = await FeatureNameEntitiesTestHelper.SeedEntityName(context, entity: FeatureNameEntitiesTestHelper.CreateValidEntityName(name: "ZFeatureName"));
+            }
+
+            HttpResponseMessage response = await _client.GetAsync("/api/v1/FeatureName?sorts[0].PropertyName=name&sorts[0].Direction=descending");
+            _ = response.EnsureSuccessStatusCode();
+
+            PaginatedList<ReadEntityNameDto>? featureName = await response.Content.ReadFromJsonAsync<PaginatedList<ReadEntityNameDto>>();
+
+            _ = featureName.ShouldNotBeNull();
+            _ = featureName.Items.ShouldNotBeNull();
+            featureName.Items.First().Id.ShouldBe(entityNameZ.Id);
+            featureName.Items.First().Name.ShouldBe(entityNameZ.Name);
         }
 
         [Fact]

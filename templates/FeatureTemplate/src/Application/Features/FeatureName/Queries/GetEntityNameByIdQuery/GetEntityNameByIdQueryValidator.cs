@@ -8,8 +8,6 @@ namespace BackendAuthTemplate.Application.Features.FeatureName.Queries.GetEntity
         public GetEntityNameByIdQueryValidator()
         {
             _ = RuleFor(x => x.EntityNameId).NotEmpty().WithErrorCode(ValidationCodes.Required);
-
-            _ = RuleFor(x => x.Include).NotNull().WithErrorCode(ValidationCodes.Required);
         }
     }
 }
