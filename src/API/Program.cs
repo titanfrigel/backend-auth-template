@@ -112,7 +112,10 @@ builder.Services.AddRateLimiter(options =>
 
 // Configure Swagger
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.OperationFilter<ApiEntityOperationFilter>();
+});
 builder.Services.ConfigureOptions<ConfigureSwaggerOptions>();
 
 builder.Services.AddAuthorization();

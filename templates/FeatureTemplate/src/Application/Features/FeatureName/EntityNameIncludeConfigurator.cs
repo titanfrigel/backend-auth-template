@@ -3,25 +3,12 @@ using BackendAuthTemplate.Domain.Entities;
 
 namespace BackendAuthTemplate.Application.Features.FeatureName
 {
-    public class EntityNameConfigurator : IncludeConfiguratorBase<EntityName>
+    public class EntityNameIncludeConfigurator : IIncludeConfigurator<EntityName>
     {
-        public override HashSet<string> DefaultIncludes =>
-        [
-        ];
-
-        public override Dictionary<string, HashSet<string>> RoleExtras => new()
+        public IncludableProperties<EntityName> Configure()
         {
-            {
-                "Admin",
-                [
-                    "createdBy"
-                ]
-            }
-        };
-
-        public override IQueryable<EntityName> ApplyIncludes(IQueryable<EntityName> query, IncludeTree includes)
-        {
-            return query;
+            return new IncludableProperties<EntityName>()
+                .Add("CreatedBy", isManualInclude: true, roles: ["Admin"]);
         }
     }
 }

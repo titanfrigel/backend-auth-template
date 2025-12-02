@@ -29,67 +29,118 @@ namespace BackendAuthTemplate.API.IntegrationTests.Controllers
         }
 
         [Fact]
-        public async Task GetAllCategoriesWithPagination_Should_Return_PaginatedList()
+        public async Task GetCategoriesWithPagination_Should_Return_PaginatedList()
         {
-            HttpResponseMessage response = await _client.GetAsync("/api/v1/categories/paginated");
+            HttpResponseMessage response = await _client.GetAsync("/api/v1/categories");
 
             _ = response.EnsureSuccessStatusCode();
 
             PaginatedList<ReadCategoryDto>? categories = await response.Content.ReadFromJsonAsync<PaginatedList<ReadCategoryDto>>();
 
             _ = categories.ShouldNotBeNull();
+            _ = categories.Items.ShouldNotBeNull();
             categories.Items.ShouldAllBe(x => x.CreatedBy == null);
         }
 
         [Fact]
-        public async Task GetAllCategories_Should_Return_List()
+        public async Task GetCategories_IncludeCreatedBy_Should_FailForUsers()
         {
-            HttpResponseMessage response = await _client.GetAsync("/api/v1/categories");
+
+            HttpResponseMessage response = await _client.GetAsync("/api/v1/categories?includes=createdBy");
 
             _ = response.EnsureSuccessStatusCode();
 
-            List<ReadCategoryDto>? categories = await response.Content.ReadFromJsonAsync<List<ReadCategoryDto>>();
+            PaginatedList<ReadCategoryDto>? categories = await response.Content.ReadFromJsonAsync<PaginatedList<ReadCategoryDto>>();
 
             _ = categories.ShouldNotBeNull();
-            categories.ShouldAllBe(x => x.CreatedBy == null);
+            _ = categories.Items.ShouldNotBeNull();
+            categories.Items.ShouldAllBe(x => x.CreatedBy == null);
         }
 
         [Fact]
-        public async Task GetAllCategories_IncludeCreatedBy_Should_FailForUsers()
-        {
-
-            HttpResponseMessage response = await _client.GetAsync("/api/v1/categories?include=createdBy");
-
-            response.IsSuccessStatusCode.ShouldBeFalse();
-        }
-
-        [Fact]
-        public async Task GetAllCategories_IncludeCreatedBy_Should_SucceedForAdmins()
+        public async Task GetCategories_IncludeCreatedBy_Should_SucceedForAdmins()
         {
             await SetAdminJwtToken();
 
-            HttpResponseMessage response = await _client.GetAsync("/api/v1/categories?include=createdBy");
+            HttpResponseMessage response = await _client.GetAsync("/api/v1/categories?includes=createdBy");
 
             _ = response.EnsureSuccessStatusCode();
 
-            List<ReadCategoryDto>? categories = await response.Content.ReadFromJsonAsync<List<ReadCategoryDto>>();
+            PaginatedList<ReadCategoryDto>? categories = await response.Content.ReadFromJsonAsync<PaginatedList<ReadCategoryDto>>();
 
             _ = categories.ShouldNotBeNull();
-            categories.ShouldAllBe(x => x.CreatedBy != null);
+            _ = categories.Items.ShouldNotBeNull();
+            categories.Items.ShouldAllBe(x => x.CreatedBy != null);
         }
 
         [Fact]
-        public async Task GetAllCategories_Include_Subcategories_ShouldReturnListOfCategories()
+        public async Task GetCategories_Include_Subcategories_ShouldReturnListOfCategories()
         {
-            HttpResponseMessage response = await _client.GetAsync("/api/v1/categories?include=subcategories");
+            HttpResponseMessage response = await _client.GetAsync("/api/v1/categories?includes=subcategories");
 
             _ = response.EnsureSuccessStatusCode();
 
-            List<ReadCategoryDto>? categories = await response.Content.ReadFromJsonAsync<List<ReadCategoryDto>>();
+            PaginatedList<ReadCategoryDto>? categories = await response.Content.ReadFromJsonAsync<PaginatedList<ReadCategoryDto>>();
 
             _ = categories.ShouldNotBeNull();
-            categories.First().Subcategories.ShouldNotBeEmpty();
-            categories.First().Subcategories!.First().Category.ShouldBeNull();
+            _ = categories.Items.ShouldNotBeNull();
+            categories.Items.First().Subcategories.ShouldNotBeEmpty();
+            categories.Items.First().Subcategories!.First().Category.ShouldBeNull();
+            categories.Items.First().Subcategories!.First().CreatedBy.ShouldBeNull();
+        }
+
+        [Fact]
+        public async Task GetCategories_Sort_NameAscending_ShouldReturnListOfCategories()
+        {
+            using IServiceScope scope = _factory.ServiceProvider.CreateScope();
+            AppDbContext context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+
+            Category categoryA;
+            Category categoryZ;
+            Func<IDisposable> beginScope = await GetSeedingScopeAsAdmin();
+            using (beginScope())
+            {
+                categoryA = await CategoriesEntitiesTestHelper.SeedCategory(context, entity: CategoriesEntitiesTestHelper.CreateValidCategory(name: "ACategory"));
+                categoryZ = await CategoriesEntitiesTestHelper.SeedCategory(context, entity: CategoriesEntitiesTestHelper.CreateValidCategory(name: "ZCategory"));
+            }
+
+            HttpResponseMessage response = await _client.GetAsync("/api/v1/categories?sorts[0].PropertyName=name&sorts[0].Direction=ascending");
+
+            _ = response.EnsureSuccessStatusCode();
+
+            PaginatedList<ReadCategoryDto>? categories = await response.Content.ReadFromJsonAsync<PaginatedList<ReadCategoryDto>>();
+
+            _ = categories.ShouldNotBeNull();
+            _ = categories.Items.ShouldNotBeNull();
+            categories.Items.First().Id.ShouldBe(categoryA.Id);
+            categories.Items.First().Name.ShouldBe(categoryA.Name);
+        }
+
+        [Fact]
+        public async Task GetCategories_Sort_NameDescending_ShouldReturnListOfCategories()
+        {
+            using IServiceScope scope = _factory.ServiceProvider.CreateScope();
+            AppDbContext context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+
+            Category categoryA;
+            Category categoryZ;
+            Func<IDisposable> beginScope = await GetSeedingScopeAsAdmin();
+            using (beginScope())
+            {
+                categoryA = await CategoriesEntitiesTestHelper.SeedCategory(context, entity: CategoriesEntitiesTestHelper.CreateValidCategory(name: "ACategory"));
+                categoryZ = await CategoriesEntitiesTestHelper.SeedCategory(context, entity: CategoriesEntitiesTestHelper.CreateValidCategory(name: "ZCategory"));
+            }
+
+            HttpResponseMessage response = await _client.GetAsync("/api/v1/categories?sorts[0].PropertyName=name&sorts[0].Direction=descending");
+
+            _ = response.EnsureSuccessStatusCode();
+
+            PaginatedList<ReadCategoryDto>? categories = await response.Content.ReadFromJsonAsync<PaginatedList<ReadCategoryDto>>();
+
+            _ = categories.ShouldNotBeNull();
+            _ = categories.Items.ShouldNotBeNull();
+            categories.Items.First().Id.ShouldBe(categoryZ.Id);
+            categories.Items.First().Name.ShouldBe(categoryZ.Name);
         }
 
         [Fact]

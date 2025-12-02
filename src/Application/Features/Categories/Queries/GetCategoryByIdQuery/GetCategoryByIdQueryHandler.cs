@@ -14,8 +14,8 @@ namespace BackendAuthTemplate.Application.Features.Categories.Queries.GetCategor
     {
         public async Task<Result<ReadCategoryDto>> Handle(GetCategoryByIdQuery request, CancellationToken cancellationToken = default)
         {
-            IncludeBuilder<Category> builder = new(includeConfigurator, request.Include, userContext.Roles);
-            IQueryable<Category> query = builder.Apply(context.Categories.AsNoTracking());
+            IQueryable<Category> query = context.Categories.AsNoTracking()
+                .ApplyIncludes(request, includeConfigurator, userContext, out HashSet<string>? validatedIncludes);
 
             Category? category = await query
                 .Where(c => c.Id == request.CategoryId)
@@ -27,7 +27,7 @@ namespace BackendAuthTemplate.Application.Features.Categories.Queries.GetCategor
             }
 
             ReadUserDto? createdBy = null;
-            if (builder.tree.ContainsKey("createdBy"))
+            if (validatedIncludes.Contains("CreatedBy"))
             {
                 createdBy = await identityService.GetUserByIdAsync(category.CreatedById, cancellationToken);
             }

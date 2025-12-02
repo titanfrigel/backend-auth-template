@@ -14,8 +14,8 @@ namespace BackendAuthTemplate.Application.Features.Subcategories.Queries.GetSubc
     {
         public async Task<Result<ReadSubcategoryDto>> Handle(GetSubcategoryByIdQuery request, CancellationToken cancellationToken = default)
         {
-            IncludeBuilder<Subcategory> builder = new(includeConfigurator, request.Include, userContext.Roles);
-            IQueryable<Subcategory> query = builder.Apply(context.Subcategories.AsNoTracking());
+            IQueryable<Subcategory> query = context.Subcategories.AsNoTracking()
+                .ApplyIncludes(request, includeConfigurator, userContext, out HashSet<string>? validatedIncludes);
 
             Subcategory? subcategory = await query
                 .Where(c => c.Id == request.SubcategoryId)
@@ -27,7 +27,7 @@ namespace BackendAuthTemplate.Application.Features.Subcategories.Queries.GetSubc
             }
 
             ReadUserDto? createdBy = null;
-            if (builder.tree.ContainsKey("createdBy"))
+            if (validatedIncludes.Contains("CreatedBy"))
             {
                 createdBy = await identityService.GetUserByIdAsync(subcategory.CreatedById, cancellationToken);
             }

@@ -1,4 +1,5 @@
-using BackendAuthTemplate.Application.Features.FeatureName.Queries.GetAllFeatureNameWithPaginationQuery;
+using BackendAuthTemplate.Application.Common.Sorting;
+using BackendAuthTemplate.Application.Features.FeatureName.Queries.GetFeatureNameWithPaginationQuery;
 using BackendAuthTemplate.Application.Features.FeatureName.Queries.GetEntityNameByIdQuery;
 
 namespace BackendAuthTemplate.Tests.Common.FeatureName
@@ -7,28 +8,30 @@ namespace BackendAuthTemplate.Tests.Common.FeatureName
     {
         public static GetEntityNameByIdQuery GetEntityNameByIdQuery(
             Guid? id = null,
-            List<string>? include = null
+            IList<string>? includes = null
         )
         {
             return new()
             {
                 EntityNameId = id ?? Guid.NewGuid(),
-                Include = include ?? []
+                Includes = includes ?? []
             };
         }
 
 
-        public static GetAllFeatureNameWithPaginationQuery GetAllFeatureNameWithPaginationQuery(
+        public static GetFeatureNameWithPaginationQuery GetFeatureNameWithPaginationQuery(
             int pageNumber = 1,
             int pageSize = 10,
-            List<string>? include = null
+            IList<string>? includes = null,
+            IList<Sort>? sorts = null
         )
         {
             return new()
             {
                 PageNumber = pageNumber,
                 PageSize = pageSize,
-                Include = include ?? []
+                Includes = includes ?? [],
+                Sorts = sorts ?? []
             };
         }
     }

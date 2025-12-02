@@ -1,5 +1,5 @@
-﻿using BackendAuthTemplate.Application.Features.Categories.Queries.GetAllCategoriesQuery;
-using BackendAuthTemplate.Application.Features.Categories.Queries.GetAllCategoriesWithPaginationQuery;
+﻿using BackendAuthTemplate.Application.Common.Sorting;
+using BackendAuthTemplate.Application.Features.Categories.Queries.GetCategoriesWithPaginationQuery;
 using BackendAuthTemplate.Application.Features.Categories.Queries.GetCategoryByIdQuery;
 
 namespace BackendAuthTemplate.Tests.Common.Categories
@@ -8,38 +8,30 @@ namespace BackendAuthTemplate.Tests.Common.Categories
     {
         public static GetCategoryByIdQuery GetCategoryByIdQuery(
             Guid? id = null,
-            List<string>? include = null
+            IList<string>? includes = null
         )
         {
             return new()
             {
                 CategoryId = id ?? Guid.NewGuid(),
-                Include = include ?? []
+                Includes = includes ?? []
             };
         }
 
 
-        public static GetAllCategoriesWithPaginationQuery GetAllCategoriesWithPaginationQuery(
+        public static GetCategoriesWithPaginationQuery GetCategoriesWithPaginationQuery(
             int pageNumber = 1,
             int pageSize = 10,
-            List<string>? include = null
+            IList<string>? includes = null,
+            IList<Sort>? sorts = null
         )
         {
             return new()
             {
                 PageNumber = pageNumber,
                 PageSize = pageSize,
-                Include = include ?? []
-            };
-        }
-
-        public static GetAllCategoriesQuery GetAllCategoriesQuery(
-            List<string>? include = null
-        )
-        {
-            return new()
-            {
-                Include = include ?? []
+                Includes = includes ?? [],
+                Sorts = sorts ?? []
             };
         }
     }

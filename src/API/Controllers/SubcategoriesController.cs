@@ -1,16 +1,16 @@
 ﻿using Asp.Versioning;
 using AutoMapper;
+using BackendAuthTemplate.API.Common.Attributes;
 using BackendAuthTemplate.API.Common.Extensions;
 using BackendAuthTemplate.API.Requests.Subcategories;
-using BackendAuthTemplate.Application.Common.Include;
 using BackendAuthTemplate.Application.Common.PaginatedList;
 using BackendAuthTemplate.Application.Common.Result;
+using BackendAuthTemplate.Application.Common.Sorting;
 using BackendAuthTemplate.Application.Features.Subcategories.Commands.CreateSubcategoryCommand;
 using BackendAuthTemplate.Application.Features.Subcategories.Commands.DeleteSubcategoryCommand;
 using BackendAuthTemplate.Application.Features.Subcategories.Commands.UpdateSubcategoryCommand;
 using BackendAuthTemplate.Application.Features.Subcategories.Dtos;
-using BackendAuthTemplate.Application.Features.Subcategories.Queries.GetAllSubcategoriesQuery;
-using BackendAuthTemplate.Application.Features.Subcategories.Queries.GetAllSubcategoriesWithPaginationQuery;
+using BackendAuthTemplate.Application.Features.Subcategories.Queries.GetSubcategoriesWithPaginationQuery;
 using BackendAuthTemplate.Application.Features.Subcategories.Queries.GetSubcategoryByIdQuery;
 using BackendAuthTemplate.Domain.Entities;
 using MediatR;
@@ -48,13 +48,13 @@ namespace BackendAuthTemplate.API.Controllers
 
         [HttpGet("{subcategoryId:guid}")]
         [AllowAnonymous]
-        [IncludeParameter(typeof(Subcategory))]
-        public async Task<ActionResult<ReadSubcategoryDto>> GetSubcategoryById(Guid subcategoryId, [FromQuery] List<string> include)
+        [ApiEntity(typeof(Subcategory))]
+        public async Task<ActionResult<ReadSubcategoryDto>> GetSubcategoryById(Guid subcategoryId, [FromQuery] IList<string>? includes)
         {
             GetSubcategoryByIdQuery query = new()
             {
                 SubcategoryId = subcategoryId,
-                Include = include
+                Includes = includes
             };
 
             Result<ReadSubcategoryDto> result = await mediator.Send(query);
@@ -67,32 +67,15 @@ namespace BackendAuthTemplate.API.Controllers
 
         [HttpGet]
         [AllowAnonymous]
-        [IncludeParameter(typeof(Subcategory))]
-        public async Task<ActionResult<List<ReadSubcategoryDto>>> GetAllSubcategories([FromQuery] List<string> include)
+        [ApiEntity(typeof(Subcategory))]
+        public async Task<ActionResult<PaginatedList<ReadSubcategoryDto>>> GetSubcategoriesPaginated([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, [FromQuery] IList<string>? includes = null, [FromQuery] IList<Sort>? sorts = null)
         {
-            GetAllSubcategoriesQuery query = new()
-            {
-                Include = include
-            };
-
-            Result<List<ReadSubcategoryDto>> result = await mediator.Send(query);
-
-            return result.Match(
-                onSuccess: Ok,
-                onFailure: Problem
-            );
-        }
-
-        [HttpGet("paginated")]
-        [AllowAnonymous]
-        [IncludeParameter(typeof(Subcategory))]
-        public async Task<ActionResult<PaginatedList<ReadSubcategoryDto>>> GetAllSubcategoriesPaginated([FromQuery] List<string> include, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
-        {
-            GetAllSubcategoriesWithPaginationQuery query = new()
+            GetSubcategoriesWithPaginationQuery query = new()
             {
                 PageNumber = pageNumber,
                 PageSize = pageSize,
-                Include = include
+                Includes = includes,
+                Sorts = sorts
             };
 
             Result<PaginatedList<ReadSubcategoryDto>> result = await mediator.Send(query);

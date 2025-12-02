@@ -14,8 +14,8 @@ namespace BackendAuthTemplate.Application.Features.FeatureName.Queries.GetEntity
     {
         public async Task<Result<ReadEntityNameDto>> Handle(GetEntityNameByIdQuery request, CancellationToken cancellationToken = default)
         {
-            IncludeBuilder<EntityName> builder = new(includeConfigurator, request.Include, userContext.Roles);
-            IQueryable<EntityName> query = builder.Apply(context.FeatureName.AsNoTracking());
+            IQueryable<EntityName> query = context.FeatureName.AsNoTracking()
+                .ApplyIncludes(request, includeConfigurator, userContext, out var validatedIncludes);
 
             EntityName? entityName = await query
                 .Where(c => c.Id == request.EntityNameId)
@@ -27,7 +27,7 @@ namespace BackendAuthTemplate.Application.Features.FeatureName.Queries.GetEntity
             }
 
             ReadUserDto? createdBy = null;
-            if (builder.tree.ContainsKey("createdBy"))
+            if (validatedIncludes.Contains("CreatedBy"))
             {
                 createdBy = await identityService.GetUserByIdAsync(entityName.CreatedById, cancellationToken);
             }

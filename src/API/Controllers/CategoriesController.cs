@@ -1,16 +1,16 @@
 ﻿using Asp.Versioning;
 using AutoMapper;
+using BackendAuthTemplate.API.Common.Attributes;
 using BackendAuthTemplate.API.Common.Extensions;
 using BackendAuthTemplate.API.Requests.Categories;
-using BackendAuthTemplate.Application.Common.Include;
 using BackendAuthTemplate.Application.Common.PaginatedList;
 using BackendAuthTemplate.Application.Common.Result;
+using BackendAuthTemplate.Application.Common.Sorting;
 using BackendAuthTemplate.Application.Features.Categories.Commands.CreateCategoryCommand;
 using BackendAuthTemplate.Application.Features.Categories.Commands.DeleteCategoryCommand;
 using BackendAuthTemplate.Application.Features.Categories.Commands.UpdateCategoryCommand;
 using BackendAuthTemplate.Application.Features.Categories.Dtos;
-using BackendAuthTemplate.Application.Features.Categories.Queries.GetAllCategoriesQuery;
-using BackendAuthTemplate.Application.Features.Categories.Queries.GetAllCategoriesWithPaginationQuery;
+using BackendAuthTemplate.Application.Features.Categories.Queries.GetCategoriesWithPaginationQuery;
 using BackendAuthTemplate.Application.Features.Categories.Queries.GetCategoryByIdQuery;
 using BackendAuthTemplate.Domain.Entities;
 using MediatR;
@@ -48,13 +48,13 @@ namespace BackendAuthTemplate.API.Controllers
 
         [HttpGet("{categoryId:guid}")]
         [AllowAnonymous]
-        [IncludeParameter(typeof(Category))]
-        public async Task<ActionResult<ReadCategoryDto>> GetCategoryById([FromRoute] Guid categoryId, [FromQuery] List<string> include)
+        [ApiEntity(typeof(Category))]
+        public async Task<ActionResult<ReadCategoryDto>> GetCategoryById([FromRoute] Guid categoryId, [FromQuery] IList<string>? includes)
         {
             GetCategoryByIdQuery query = new()
             {
                 CategoryId = categoryId,
-                Include = include
+                Includes = includes
             };
 
             Result<ReadCategoryDto> result = await mediator.Send(query);
@@ -67,32 +67,15 @@ namespace BackendAuthTemplate.API.Controllers
 
         [HttpGet]
         [AllowAnonymous]
-        [IncludeParameter(typeof(Category))]
-        public async Task<ActionResult<List<ReadCategoryDto>>> GetAllCategories([FromQuery] List<string> include)
+        [ApiEntity(typeof(Category))]
+        public async Task<ActionResult<PaginatedList<ReadCategoryDto>>> GetCategoriesPaginated([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, [FromQuery] IList<string>? includes = null, [FromQuery] IList<Sort>? sorts = null)
         {
-            GetAllCategoriesQuery query = new()
-            {
-                Include = include
-            };
-
-            Result<List<ReadCategoryDto>> result = await mediator.Send(query);
-
-            return result.Match(
-                onSuccess: Ok,
-                onFailure: Problem
-            );
-        }
-
-        [HttpGet("paginated")]
-        [AllowAnonymous]
-        [IncludeParameter(typeof(Category))]
-        public async Task<ActionResult<PaginatedList<ReadCategoryDto>>> GetAllCategoriesPaginated([FromQuery] List<string> include, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
-        {
-            GetAllCategoriesWithPaginationQuery query = new()
+            GetCategoriesWithPaginationQuery query = new()
             {
                 PageNumber = pageNumber,
                 PageSize = pageSize,
-                Include = include
+                Includes = includes,
+                Sorts = sorts
             };
 
             Result<PaginatedList<ReadCategoryDto>> result = await mediator.Send(query);
