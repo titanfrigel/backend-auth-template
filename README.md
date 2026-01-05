@@ -2,6 +2,7 @@
 
 This project is a robust and feature-rich backend template built with .NET 8, designed to serve as a comprehensive starting point for modern web applications. It showcases a clean, maintainable, and scalable architecture, incorporating a wide range of best practices and advanced features. This template is ideal for developers looking to build secure, high-performance applications while adhering to industry-standard design patterns.
 
+This template is designed to work with the [Frontend Auth Intl Template](https://github.com/titanfrigel/frontend-auth-intl-template), but it can also be used as a standalone backend.
 
 ## Key Features
 
