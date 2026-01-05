@@ -20,8 +20,8 @@ services:
         - Auth__SigningKey=Xkg0YDF7UXsnZE9cdk9le3w0MmU1QTp5PEhlQHFGLEw=
         - Auth__ValidAudience=backendauthtemplate
         - Auth__ValidIssuer=backendauthtemplate
-        - Emails__SendToEmail=arthur.thomas@arkeios.com
-        - Emails__SendToName=Arthur Thomas
+        - Emails__SendToEmail=sendto@example.com
+        - Emails__SendToName=SendToName
         - General__FrontendUri=https://example.com
         - Logging__LogLevel__Default=Information
         - Logging__LogLevel__Microsoft.AspNetCore=Warning
