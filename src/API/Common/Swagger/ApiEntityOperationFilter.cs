@@ -20,7 +20,7 @@ public class ApiEntityOperationFilter(IServiceProvider serviceProvider) : IOpera
 
         using IServiceScope scope = serviceProvider.CreateScope();
 
-        if (operation.Parameters.Any(p => p.Name.Equals("include", StringComparison.OrdinalIgnoreCase)))
+        if (operation.Parameters.Any(p => p.Name.Equals("includes", StringComparison.OrdinalIgnoreCase)))
         {
             AddDescription<IIncludeConfigurator<object>>(scope, attribute.EntityType, operation, "Includable properties");
         }
