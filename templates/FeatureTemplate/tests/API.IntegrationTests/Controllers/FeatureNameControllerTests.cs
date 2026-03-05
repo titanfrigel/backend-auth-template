@@ -20,7 +20,7 @@ namespace BackendAuthTemplate.API.IntegrationTests.Controllers
 
             CreateEntityNameRequest request = FeatureNameRequestsTestHelper.CreateEntityNameRequest();
 
-            HttpResponseMessage response = await _client.PostAsJsonAsync("/api/v1/FeatureName", request);
+            HttpResponseMessage response = await _client.PostAsJsonAsync("/api/v1/featureName", request);
             response.StatusCode.ShouldBe(HttpStatusCode.Created);
 
             ReadEntityNameDto? entityName = await response.Content.ReadFromJsonAsync<ReadEntityNameDto>();
@@ -31,7 +31,7 @@ namespace BackendAuthTemplate.API.IntegrationTests.Controllers
         [Fact]
         public async Task GetFeatureName_Should_Return_PaginatedList()
         {
-            HttpResponseMessage response = await _client.GetAsync("/api/v1/FeatureName");
+            HttpResponseMessage response = await _client.GetAsync("/api/v1/featureName");
 
             _ = response.EnsureSuccessStatusCode();
 
@@ -46,7 +46,7 @@ namespace BackendAuthTemplate.API.IntegrationTests.Controllers
         [Fact]
         public async Task GetFeatureName_IncludeCreatedBy_Should_FailForUsers()
         {
-            HttpResponseMessage response = await _client.GetAsync("/api/v1/FeatureName?includes=createdBy");
+            HttpResponseMessage response = await _client.GetAsync("/api/v1/featureName?includes=createdBy");
 
             _ = response.EnsureSuccessStatusCode();
 
@@ -62,7 +62,7 @@ namespace BackendAuthTemplate.API.IntegrationTests.Controllers
         {
             await SetAdminJwtToken();
 
-            HttpResponseMessage response = await _client.GetAsync("/api/v1/FeatureName?includes=createdBy");
+            HttpResponseMessage response = await _client.GetAsync("/api/v1/featureName?includes=createdBy");
 
             _ = response.EnsureSuccessStatusCode();
 
@@ -88,7 +88,7 @@ namespace BackendAuthTemplate.API.IntegrationTests.Controllers
                 entityNameZ = await FeatureNameEntitiesTestHelper.SeedEntityName(context, entity: FeatureNameEntitiesTestHelper.CreateValidEntityName(name: "ZFeatureName"));
             }
 
-            HttpResponseMessage response = await _client.GetAsync("/api/v1/FeatureName?sorts[0].PropertyName=name&sorts[0].Direction=ascending");
+            HttpResponseMessage response = await _client.GetAsync("/api/v1/featureName?sorts[0].PropertyName=name&sorts[0].Direction=ascending");
             _ = response.EnsureSuccessStatusCode();
 
             PaginatedList<ReadEntityNameDto>? featureName = await response.Content.ReadFromJsonAsync<PaginatedList<ReadEntityNameDto>>();
@@ -114,7 +114,7 @@ namespace BackendAuthTemplate.API.IntegrationTests.Controllers
                 entityNameZ = await FeatureNameEntitiesTestHelper.SeedEntityName(context, entity: FeatureNameEntitiesTestHelper.CreateValidEntityName(name: "ZFeatureName"));
             }
 
-            HttpResponseMessage response = await _client.GetAsync("/api/v1/FeatureName?sorts[0].PropertyName=name&sorts[0].Direction=descending");
+            HttpResponseMessage response = await _client.GetAsync("/api/v1/featureName?sorts[0].PropertyName=name&sorts[0].Direction=descending");
             _ = response.EnsureSuccessStatusCode();
 
             PaginatedList<ReadEntityNameDto>? featureName = await response.Content.ReadFromJsonAsync<PaginatedList<ReadEntityNameDto>>();
@@ -138,7 +138,7 @@ namespace BackendAuthTemplate.API.IntegrationTests.Controllers
                 entityName = await FeatureNameEntitiesTestHelper.SeedEntityName(context);
             }
 
-            HttpResponseMessage response = await _client.GetAsync($"/api/v1/FeatureName/{entityName.Id}");
+            HttpResponseMessage response = await _client.GetAsync($"/api/v1/featureName/{entityName.Id}");
 
             _ = response.EnsureSuccessStatusCode();
 
@@ -165,7 +165,7 @@ namespace BackendAuthTemplate.API.IntegrationTests.Controllers
 
             UpdateEntityNameRequest request = FeatureNameRequestsTestHelper.UpdateEntityNameRequest(name: "Updated Name");
 
-            HttpResponseMessage response = await _client.PutAsJsonAsync($"/api/v1/FeatureName/{entityName.Id}", request);
+            HttpResponseMessage response = await _client.PutAsJsonAsync($"/api/v1/featureName/{entityName.Id}", request);
 
             response.StatusCode.ShouldBe(HttpStatusCode.NoContent);
         }
@@ -185,7 +185,7 @@ namespace BackendAuthTemplate.API.IntegrationTests.Controllers
                 entityName = await FeatureNameEntitiesTestHelper.SeedEntityName(context);
             }
 
-            HttpResponseMessage response = await _client.DeleteAsync($"/api/v1/FeatureName/{entityName.Id}");
+            HttpResponseMessage response = await _client.DeleteAsync($"/api/v1/featureName/{entityName.Id}");
 
             response.StatusCode.ShouldBe(HttpStatusCode.NoContent);
         }
