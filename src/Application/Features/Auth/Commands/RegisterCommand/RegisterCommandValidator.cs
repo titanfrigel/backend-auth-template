@@ -21,13 +21,13 @@ namespace BackendAuthTemplate.Application.Features.Auth.Commands.RegisterCommand
                 .NotEmpty().WithErrorCode(ValidationCodes.Required)
                 .MinimumLength(2).WithErrorCode(ValidationCodes.TooShort)
                 .MaximumLength(100).WithErrorCode(ValidationCodes.TooLong)
-                .Matches(@"^[A-Za-zÀ-ÿ'-]+( [A-Za-zÀ-ÿ'-]+)*$").WithErrorCode(ValidationCodes.Invalid);
+                .Matches(@"^[\p{L}'-]+( [\p{L}'-]+)*$").WithErrorCode(ValidationCodes.Invalid);
 
             _ = RuleFor(x => x.LastName)
                 .NotEmpty().WithErrorCode(ValidationCodes.Required)
                 .MinimumLength(2).WithErrorCode(ValidationCodes.TooShort)
                 .MaximumLength(100).WithErrorCode(ValidationCodes.TooLong)
-                .Matches(@"^[A-Za-zÀ-ÿ'-]+( [A-Za-zÀ-ÿ'-]+)*$").WithErrorCode(ValidationCodes.Invalid);
+                .Matches(@"^[\p{L}'-]+( [\p{L}'-]+)*$").WithErrorCode(ValidationCodes.Invalid);
 
             _ = RuleFor(x => x.PhoneNumber)
                 .NotEmpty().WithErrorCode(ValidationCodes.Required)

@@ -24,15 +24,6 @@
             );
         }
 
-        public static Error Validation(string field)
-        {
-            return new Error(
-                code: $"{Instance.Entity}.{field}.{ErrorType.Validation}",
-                message: $"Validation error on field '{field}'.",
-                errorType: ErrorType.Validation
-            );
-        }
-
         public static Error Conflict(string field)
         {
             return new Error(

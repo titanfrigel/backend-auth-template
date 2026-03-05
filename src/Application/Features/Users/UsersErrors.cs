@@ -38,7 +38,7 @@ namespace BackendAuthTemplate.Application.Features.Users
             return new Error(
                 code: $"{Instance.Entity}.InvalidToken",
                 message: "Invalid token.",
-                errorType: ErrorType.Validation
+                errorType: ErrorType.Failure
             );
         }
 

@@ -29,10 +29,7 @@ namespace BackendAuthTemplate.Tests.Common.Subcategories
         {
             if (entity != null)
             {
-                if (categoryId.HasValue)
-                {
-                    entity.CategoryId = categoryId.Value;
-                }
+                entity.CategoryId = categoryId ?? (await CategoriesEntitiesTestHelper.SeedCategory(context)).Id;
 
                 _ = context.Subcategories.Add(entity);
                 _ = await context.SaveChangesAsync(CancellationToken.None);
