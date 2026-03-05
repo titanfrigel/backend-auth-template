@@ -28,10 +28,9 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 8.0.x
-          cache: true
 
       - name: Restore dependencies
         run: dotnet restore BackendAuthTemplate.sln
 
       - name: Run tests
-        run: dotnet test BackendAuthTemplate.sln --no-build --verbosity normal
+        run: dotnet test BackendAuthTemplate.sln --verbosity normal
