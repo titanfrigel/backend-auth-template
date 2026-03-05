@@ -73,7 +73,7 @@ namespace BackendAuthTemplate.Infrastructure
             _ = services.AddTransient<CustomEmailConfirmationTokenProvider<AppUser>>();
             _ = services.AddTransient<CustomPasswordResetTokenProvider<AppUser>>();
 
-            _ = services.AddHostedService<UnconfirmedUserCleanupService>();
+            _ = services.AddHostedService<UnconfirmedUserCleanupWorker>();
 
             _ = services.AddSingleton<IHtmlRenderer, RazorHtmlRenderer>();
 
@@ -83,6 +83,7 @@ namespace BackendAuthTemplate.Infrastructure
             _ = services.AddScoped<ICookieService, CookieService>();
             _ = services.AddScoped<ITokenService, TokenService>();
             _ = services.AddScoped<IIdentityService, IdentityService>();
+            _ = services.AddScoped<IUnconfirmedUserCleanupExecutor, UnconfirmedUserCleanupExecutor>();
 
             return services;
         }

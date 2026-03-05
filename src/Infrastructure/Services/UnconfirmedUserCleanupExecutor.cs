@@ -10,33 +10,12 @@ using Microsoft.Extensions.Options;
 
 namespace BackendAuthTemplate.Infrastructure.Services
 {
-    public class UnconfirmedUserCleanupService(IServiceProvider serviceProvider, IOptions<SecuritySettings> securityOptions, TimeProvider timeProvider, ILogger<UnconfirmedUserCleanupService> logger) : BackgroundService
+    public class UnconfirmedUserCleanupExecutor(IUser userContext, UserManager<AppUser> userManager, IOptions<SecuritySettings> securityOptions, TimeProvider timeProvider, ILogger<IUnconfirmedUserCleanupExecutor> logger) : IUnconfirmedUserCleanupExecutor
     {
         private readonly SecuritySettings securitySettings = securityOptions.Value;
 
-        protected override async Task ExecuteAsync(CancellationToken cancellationToken = default)
+        public async Task CleanupUnconfirmedAccounts(CancellationToken cancellationToken = default)
         {
-            while (!cancellationToken.IsCancellationRequested)
-            {
-                try
-                {
-                    await CleanupUnconfirmedAccounts(cancellationToken);
-                }
-                catch (Exception ex)
-                {
-                    logger.LogError(ex, "Error while auto-deleting unconfirmed users");
-                }
-
-                await Task.Delay(TimeSpan.FromDays(securitySettings.UnconfirmedUserCleanupIntervalInDays), cancellationToken);
-            }
-        }
-
-        private async Task CleanupUnconfirmedAccounts(CancellationToken cancellationToken = default)
-        {
-            using IServiceScope scope = serviceProvider.CreateScope();
-            UserManager<AppUser> userManager = scope.ServiceProvider.GetRequiredService<UserManager<AppUser>>();
-            IUser userContext = scope.ServiceProvider.GetRequiredService<IUser>();
-
             DateTimeOffset threshold = timeProvider.GetUtcNow().Subtract(TimeSpan.FromDays(securitySettings.UnconfirmedUserCleanupTimeInDays));
 
             List<AppUser> unconfirmedUsers = await userManager.Users
